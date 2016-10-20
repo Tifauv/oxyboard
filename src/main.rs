@@ -1,11 +1,12 @@
 extern crate iron;
 extern crate router;
+extern crate oxyboard;
 
 use std::io::Read;
 use iron::prelude::*;
 use iron::status;
 use router::Router;
-
+use oxyboard::history::History;
 
 
 /**
@@ -36,7 +37,7 @@ fn post(p_request: &mut Request) -> IronResult<Response> {
  * Main function that sets the Iron server up and starts it.
  */
 fn main() {
-	let listenAddress = "localhost:8080";
+	let listen_address = "localhost:8080";
 
 	// Create the request router
 	let mut router = Router::new();
@@ -45,8 +46,8 @@ fn main() {
 
 	// Start the server
 	println!("Starting board...");
-	println!("  - backend: http://{}/backend", listenAddress);
-	println!("  - port   : http://{}/post"   , listenAddress);
+	println!("  - backend: http://{}/backend", listen_address);
+	println!("  - port   : http://{}/post"   , listen_address);
 	println!("Use Ctrl-C to abort.");
-	Iron::new(router).http(listenAddress).unwrap();
+	Iron::new(router).http(listen_address).unwrap();
 }
