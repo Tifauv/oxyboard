@@ -6,3 +6,5 @@ authors = [ "Olivier Serve <tifauv@gmail.com>" ]
 [dependencies]
 iron   = "*"
 router = "*"
+persistent = "*"
+
