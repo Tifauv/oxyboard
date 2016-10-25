@@ -1,16 +1,19 @@
 use post::Post;
+use message::Message;
 use std::vec::Vec;
 
 pub struct History {
     posts: Vec<Post>,
-    maxSize: usize,
+    max_size: usize,
+    last_post_id: u32,
 }
 
 impl History {
-    pub fn new(p_maxSize:usize) -> History {
+    pub fn new(p_max_size:usize) -> History {
         History {
             posts: Vec::new(),
-            maxSize: p_maxSize,
+            max_size: p_max_size,
+            last_post_id: 1,
         }
     }
     
@@ -20,11 +23,14 @@ impl History {
     }
     
     
-    pub fn add(&mut self, p_post:Post) -> &mut History {
-        if (self.posts.len() >= self.maxSize) {
+    pub fn add(&mut self, p_message:Message) -> u32 {
+        if self.posts.len() >= self.max_size {
             self.posts.remove(0);
         }
-        self.posts.push(p_post);
-        self
-    }
+
+        self.last_post_id += 1;
+        let post = Post::new(self.last_post_id, p_message);
+        self.posts.push(post);
+		self.last_post_id
+	}
 }

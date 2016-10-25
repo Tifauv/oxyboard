@@ -1,19 +1,21 @@
+use message::Message;
+
 pub struct Post {
-	id: u32,
-	timestamp: String,
-	login: String,
-	user_agent: String,
-	message: String,
+	pub id: u32,
+	pub timestamp: String,
+	pub login: String,
+	pub user_agent: String,
+	pub message: String,
 }
 
 impl Post {
-	pub fn new(p_id:u32, p_timestamp:String, p_login:String, p_user_agent:String, p_message: String) -> Post {
+	pub fn new(p_id:u32, p_message:Message) -> Post {
 		Post {
-			id: p_id,
-			timestamp: p_timestamp,
-			login: p_login,
-			user_agent: p_user_agent,
-			message: p_message,
+			id        : p_id,
+			timestamp : p_message.timestamp,
+			login     : p_message.login,
+			user_agent: p_message.user_agent,
+			message   : p_message.message,
 		}
     }
 
