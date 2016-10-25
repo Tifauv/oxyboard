@@ -20,8 +20,12 @@ fn backend(p_request: &mut Request) -> IronResult<Response> {
 	let lock = p_request.get::<State<History>>().unwrap();
 	let mut history = lock.read().unwrap();
 
-	let backend_xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><board></board>";
-
+	// Build the backend
+	let mut backend_xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><board>\n".to_string();
+	for post in history.iter() {
+		backend_xml = backend_xml + &format!("<post time=\"{}\" id=\"{}\"><info>{}</info><message>{}</message><login>{}</login></post>\n", post.timestamp, post.id, post.user_agent, post.message, post.login);
+	}
+	backend_xml = backend_xml + &"</board>";
 
 	Ok( Response::with(( status::Ok, backend_xml )))
 }
