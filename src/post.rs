@@ -36,10 +36,13 @@ impl Message {
 	 *
 	 * let msg = Message::new(String::from("ptramo"), String::from("Firefox/48.0.1"), String::from("Hello World !"));
 	 * ```
+	 *
+	 * # Panics
+	 * If `p_user_agent` or `p_message` is empty.
 	 */
 	pub fn new(p_login:String, p_user_agent:String, p_message: String) -> Message {
-		assert!(true, p_user_agent != "");
-		assert!(true, p_message != "");
+		assert!(!p_user_agent.is_empty());
+		assert!(!p_message.is_empty());
 
 		Message {
 			login: p_login,
