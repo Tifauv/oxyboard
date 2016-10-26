@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = [ "Olivier Serve <tifauv@gmail.com>" ]
 
 [dependencies]
+time       = "*"
 iron       = "*"
 router     = "*"
 persistent = "*"
