@@ -1,17 +1,32 @@
 /*!
  * A `post` sent by a user.
  *
- * A `Message` should have a very short life.
- * It represents the data extracted from the user's request, and
- * is then translated into a `Post` when added to the `History`.
+ * This module contains two types, `Message` and `Post` which are the building
+ * blocks of a board.
  */
 
+/**
+ * Represents the data extracted from a post request.
+ *
+ * The `login` field is the account name of the author if the user is
+ * authenticated.
+ *
+ * The `user_agent` field is the UserAgent HTTP header of the post request. It is used
+ * as a lousy author identification mechanism for unauthenticated posts. As it
+ * can be modified at will by browser extensions or dedicated clients, it is
+ * easy to set and modify, even if it cannot provide a verified identity.
+ *
+ * The `message` field contains the message content. It is retrieved form the
+ * form-encoded POST data.
+ *
+ * A `Message` should be short-lived.
+ */
 pub struct Message {
-	/// The user's login (may be empty) 
+	/// The user's login (may be empty)
 	pub login: String,
 	/// The user's UserAgent header value (should not be empty)
 	pub user_agent: String,
-	/// The message content (shoud not be empty)
+	/// The message content (may be empty)
 	pub message: String,
 }
 
@@ -38,11 +53,10 @@ impl Message {
 	 * ```
 	 *
 	 * # Panics
-	 * If `p_user_agent` or `p_message` is empty.
+	 * If `p_user_agent` is empty.
 	 */
 	pub fn new(p_login:String, p_user_agent:String, p_message: String) -> Message {
 		assert!(!p_user_agent.is_empty());
-		assert!(!p_message.is_empty());
 
 		Message {
 			login: p_login,
@@ -52,16 +66,30 @@ impl Message {
     }
 }
 
+
+/**
+ * Represents a post in the `History`.
+ *
+ * It contains the same data as `Message` and adds two metadata, `id` and `time`.
+ *
+ * The `id` field is a unique identifier of the post. It can be used to track responses to a
+ * message.
+ *
+ * The `time` field is a datetime that follows the format "yyyymmddhhMMss". It is the official
+ * timestamp of the post. It can also be used to track responses to a message.
+ *
+ * A `Post` is created from a `Message` when the later is added to the `History`.
+ */
 pub struct Post {
 	/// The post's unique identifier
 	pub id: u32,
 	/// The datetime when the post was added to the history
 	pub time: String,
-	/// The user's login (may be empty) 
+	/// The user's login (may be empty)
 	pub login: String,
 	/// The user's UserAgent header value
 	pub user_agent: String,
-	/// The message content
+	/// The message content (may be empty)
 	pub message: String,
 }
 
@@ -97,7 +125,7 @@ impl Post {
 	 *
 	 * # Examples
 	 *
-	 * Example for an anonymous post :
+	 * Example for an anonymous post:
 	 *
 	 * ```
 	 * use oxyboard::post::Message;
@@ -108,7 +136,8 @@ impl Post {
 	 * assert!(!post.is_authenticated());
 	 * ```
 	 *
-	 * Example for an authenticated post :
+	 * Example for an authenticated post:
+	 *
 	 * ```
 	 * use oxyboard::post::Message;
 	 * use oxyboard::post::Post;
