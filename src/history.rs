@@ -1,5 +1,8 @@
+extern crate iron;
+
+use self::iron::typemap::Key;
+use post::Message;
 use post::Post;
-use message::Message;
 use std::slice::Iter;
 use std::vec::Vec;
 
@@ -30,7 +33,7 @@ impl History {
 		}
 		
 		self.last_post_id += 1;
-		let post = Post::new(self.last_post_id, p_message);
+		let post = Post::new(self.last_post_id, String::from("20161026120000"), p_message);
 		self.posts.push(post);
 		self.last_post_id
 	}
@@ -39,4 +42,8 @@ impl History {
 	pub fn iter(&self) -> Iter<Post> {
 		self.posts.iter()
 	}
+}
+
+impl Key for History {
+	type Value = History;
 }

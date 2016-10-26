@@ -7,7 +7,7 @@ use iron::headers::UserAgent;
 use iron::prelude::*;
 use iron::status;
 use oxyboard::history::History;
-use oxyboard::message::Message;
+use oxyboard::post::Message;
 use persistent::State;
 use router::Router;
 use std::io::Read;
@@ -24,7 +24,14 @@ fn backend(p_request: &mut Request) -> IronResult<Response> {
 	// Build the backend
 	let mut backend_xml = String::from("<?xml version=\"1.0\" encoding=\"utf-8\"?><board>\n");
 	for post in history.iter() {
-		backend_xml = backend_xml + &format!("<post time=\"{}\" id=\"{}\"><info>{}</info><message>{}</message><login>{}</login></post>\n", post.timestamp, post.id, post.user_agent, post.message, post.login);
+		backend_xml = backend_xml + &format!("<post time=\"{}\" id=\"{}\">", post.id, post.timestamp);
+		backend_xml = backend_xml + &format!("<info>{}</info>", post.user_agent);
+		backend_xml = backend_xml + &format!("<message>{}</message>", post.message);
+		match post.login {
+			Some(ref x) => backend_xml = backend_xml + &format!("<login>{}</login>", x),
+			None    => backend_xml = backend_xml + "<login>Anonymous Coward</login>",
+		}
+		backend_xml = backend_xml + &format!("</post>\n");
 	}
 	backend_xml.push_str("</board>");
 
@@ -54,7 +61,7 @@ fn post(p_request: &mut Request) -> IronResult<Response> {
 	};
 
 	// Store the message and return the post id
-	let post_id = history.add(Message::new(String::from("20161024"), String::from(""), user_agent.to_string(), message));
+	let post_id = history.add(Message::new(None, user_agent.to_string(), message));
 	Ok( Response::with(( status::Created, format!("X-Post-Id: {}", post_id) )))
 }
 
