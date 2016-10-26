@@ -22,9 +22,9 @@ impl Message {
 	 * # Examples
 	 *
 	 * ```
-	 * use oxyboard::message::Message;
+	 * use oxyboard::post::Message;
 	 *
-	 * let msg = Message::new(None, "Firefox/48.0.1", "Hello World !");
+	 * let msg = Message::new(None, String::from("Firefox/48.0.1"), String::from("Hello World !"));
 	 * ```
 	 */
 	pub fn new(p_login:Option<String>, p_user_agent:String, p_message: String) -> Message {
@@ -63,8 +63,8 @@ impl Post {
 	 * use oxyboard::post::Message;
 	 * use oxyboard::post::Post;
 	 *
-	 * let msg = Message::new(None, "Firefox/48.0.1", "Hello World !");
-	 * let post = Post::new(42, "20161026120000", msg);
+	 * let msg = Message::new(None, String::from("Firefox/48.0.1"), String::from("Hello World !"));
+	 * let post = Post::new(42, String::from("20161026120000"), msg);
 	 * ```
 	 */
 	pub fn new(p_id:u32, p_timestamp:String, p_message:Message) -> Post {
