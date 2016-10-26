@@ -43,7 +43,7 @@ fn backend(p_request: &mut Request) -> IronResult<Response> {
  *            the HTTP request
  */
 fn post(p_request: &mut Request) -> IronResult<Response> {
-	// Get access to the the shared history
+	// Get access to the shared history
 	let lock = p_request.get::<State<History>>().unwrap();
 	let mut history = lock.write().unwrap();
 
@@ -78,7 +78,7 @@ fn main() {
 	let mut history = History::new(512);
 	let mut chain = Chain::new(router);
 	chain.link(State::<History>::both(history));
-    
+
 	// Start the server
 	println!("Starting board...");
 	println!("  - backend: http://{}/backend", listen_address);
