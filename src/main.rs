@@ -3,14 +3,12 @@ extern crate oxyboard;
 extern crate persistent;
 extern crate router;
 
-use iron::headers::UserAgent;
 use iron::prelude::*;
 use iron::status;
 use oxyboard::history::History;
-use oxyboard::post::Message;
+use oxyboard::post::PostRequest;
 use persistent::State;
 use router::Router;
-use std::io::Read;
 
 
 /**
@@ -24,10 +22,10 @@ fn backend(p_request: &mut Request) -> IronResult<Response> {
 	// Build the backend
 	let mut backend_xml = String::from("<?xml version=\"1.0\" encoding=\"utf-8\"?><board>\n");
 	for post in history.iter() {
-		backend_xml = backend_xml + &format!("<post time=\"{}\" id=\"{}\">", post.id, post.time);
-		backend_xml = backend_xml + &format!("<info>{}</info>", post.user_agent);
-		backend_xml = backend_xml + &format!("<message>{}</message>", post.message);
-		backend_xml = backend_xml + &format!("<login>{}</login>", post.login);
+		backend_xml = backend_xml + &format!("<post id=\"{}\" time=\"{}\">", post.id(), post.time());
+		backend_xml = backend_xml + &format!("<info>{}</info>", post.user_agent());
+		backend_xml = backend_xml + &format!("<message>{}</message>", post.message());
+		backend_xml = backend_xml + &format!("<login>{}</login>", post.login());
 		backend_xml = backend_xml + &format!("</post>\n");
 	}
 	backend_xml.push_str("</board>");
@@ -47,18 +45,8 @@ fn post(p_request: &mut Request) -> IronResult<Response> {
 	let lock = p_request.get::<State<History>>().unwrap();
 	let mut history = lock.write().unwrap();
 
-	// Extract the message
-	let mut message = String::new();
-	p_request.body.read_to_string(&mut message).unwrap();
-
-	// Extract the user-agent
-	let user_agent = match p_request.headers.get::<UserAgent>() {
-		Some(x) => x,
-		None    => "Anonyme"
-	};
-
 	// Store the message and return the post id
-	let post_id = history.add(Message::new(String::from(""), user_agent.to_string(), message));
+	let post_id = history.add(PostRequest::from_request(p_request));
 	Ok( Response::with(( status::Created, format!("X-Post-Id: {}", post_id) )))
 }
 
