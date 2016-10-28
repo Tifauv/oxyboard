@@ -10,5 +10,5 @@ router     = "*"
 persistent = "*"
 
 [[bin]]
-name = "main"
+name = "oxyboard"
 doc  = false
