@@ -23,9 +23,9 @@ fn backend(p_request: &mut Request) -> IronResult<Response> {
 	let mut backend_xml = String::from("<?xml version=\"1.0\" encoding=\"utf-8\"?><board>\n");
 	for post in history.iter() {
 		backend_xml = backend_xml + &format!("<post id=\"{}\" time=\"{}\">", post.id(), post.time());
-		backend_xml = backend_xml + &format!("<info>{}</info>", post.user_agent());
-		backend_xml = backend_xml + &format!("<message>{}</message>", post.message());
-		backend_xml = backend_xml + &format!("<login>{}</login>", post.login());
+		backend_xml = backend_xml + &format!("<info><![CDATA[{}]]></info>", post.user_agent());
+		backend_xml = backend_xml + &format!("<message><![CDATA[{}]]></message>", post.message());
+		backend_xml = backend_xml + &format!("<login><![CDATA[{}]]></login>", post.login());
 		backend_xml = backend_xml + &format!("</post>\n");
 	}
 	backend_xml.push_str("</board>");
