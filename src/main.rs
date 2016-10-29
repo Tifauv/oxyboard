@@ -6,7 +6,7 @@ extern crate router;
 use iron::prelude::*;
 use iron::status;
 use oxyboard::history::History;
-use oxyboard::post::PostRequest;
+use oxyboard::requests::post;
 use persistent::State;
 use router::Router;
 
@@ -17,7 +17,7 @@ use router::Router;
 fn backend(p_request: &mut Request) -> IronResult<Response> {
 	// Get access to the the shared history
 	let lock = p_request.get::<State<History>>().unwrap();
-	let mut history = lock.read().unwrap();
+	let history = lock.read().unwrap();
 
 	// Build the backend
 	let mut backend_xml = String::from("<?xml version=\"1.0\" encoding=\"utf-8\"?><board>\n");
@@ -35,23 +35,6 @@ fn backend(p_request: &mut Request) -> IronResult<Response> {
 
 
 /**
- * Handler function that manages the message reception.
- *
- * @param p_request
- *            the HTTP request
- */
-fn post(p_request: &mut Request) -> IronResult<Response> {
-	// Get access to the shared history
-	let lock = p_request.get::<State<History>>().unwrap();
-	let mut history = lock.write().unwrap();
-
-	// Store the message and return the post id
-	let post_id = history.add(PostRequest::from_request(p_request));
-	Ok( Response::with(( status::Created, format!("X-Post-Id: {}", post_id) )))
-}
-
-
-/**
  * Main function that sets the Iron server up and starts it.
  */
 fn main() {
@@ -59,8 +42,8 @@ fn main() {
 
 	// Create the request router
 	let mut router = Router::new();
-	router.get("/backend", backend, "backend_xml");
-	router.post("/post", post, "post_message");
+	router.get("/backend", backend,      "backend_xml");
+	router.post("/post",   post::post_handler, "post_message");
 
 	// Create the history
 	let mut history = History::new(512);

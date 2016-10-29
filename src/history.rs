@@ -1,8 +1,7 @@
 extern crate iron;
 extern crate time;
 
-use post::PostRequest;
-use post::Post;
+use post::{Post,UserPost};
 use self::iron::typemap::Key;
 use self::time::{now,strftime};
 use std::slice::Iter;
@@ -30,7 +29,7 @@ impl History {
 	}
 
 
-	pub fn add(&mut self, p_parser:PostRequest) -> u32 {
+	pub fn add(&mut self, p_user_post:UserPost) -> u32 {
 		// Get the current time
 		let datetime = match strftime("%Y%m%d%H%M%S", &now()) {
 			Ok(x) => x,
@@ -38,7 +37,7 @@ impl History {
 		};
 
 		// Create the new Post
-		let post = Post::new(self.next_post_id, datetime, p_parser);
+		let post = Post::new(self.next_post_id, datetime, p_user_post);
 
 		// Remove the oldest post if the history will exceed its maximum size
 		if self.posts.len() >= self.max_size {
@@ -46,11 +45,12 @@ impl History {
 		}
 
 		// Add the new post
+		let post_id = post.id();
 		self.posts.push(post);
 
 		// Increment the post id counter
 		self.next_post_id += 1;
-		self.next_post_id
+		post_id
 	}
 
 
