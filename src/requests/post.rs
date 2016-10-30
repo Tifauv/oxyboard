@@ -1,5 +1,5 @@
 /*!
- * A parser for post requests.
+ * The functions that handle a post request.
  */
 
 extern crate iron;
