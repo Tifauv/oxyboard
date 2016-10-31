@@ -12,30 +12,29 @@ use self::persistent::State;
 use self::iron::headers::UserAgent;
 use self::iron::prelude::*;
 use std::io::Read;
+use std::result::Result;
 
 
 /**
  * Constructs a new `UserPost` from an iron Request.
  */
-fn make_user_post(p_request:&mut Request) -> UserPost {
-	// Extract the message
-	let mut body = String::new();
-	p_request.body.read_to_string(&mut body).unwrap();
-	let message = match extract_message(&body) {
-		Some(m) => m.trim(),
-		None    => ""
-	};
-
+fn make_user_post<'a>(p_request:&mut Request) -> Result<UserPost, &'a str> {
 	// Extract the user-agent
 	let user_agent = match p_request.headers.get::<UserAgent>() {
 		Some(ua) => ua.trim(),
 		None     => "Anonyme"
 	};
 
-	UserPost {
-		login     : String::new(),
-		user_agent: user_agent.to_string(),
-		message   : message.to_string()
+	// Extract the message
+	let mut body = String::new();
+	p_request.body.read_to_string(&mut body).unwrap();
+	match extract_message(&body) {
+		Some(msg) => Ok(UserPost {
+						login     : String::new(),
+						user_agent: user_agent.to_string(),
+						message   : msg.trim().to_string()
+					}),
+		None      => Err("No message in the request")
 	}
 }
 
@@ -67,6 +66,11 @@ pub fn post_handler(p_request: &mut Request) -> IronResult<Response> {
 	let mut history = lock.write().unwrap();
 
 	// Store the message and return the post id
-	let post_id = history.add(make_user_post(p_request));
-	Ok( Response::with(( status::Created, format!("X-Post-Id: {}", post_id) )))
+	match make_user_post(p_request) {
+		Ok(user_post) => match history.add(user_post) {
+				Ok(post_id)  => Ok( Response::with(( status::Created, format!("X-Post-Id: {}", post_id) )) ),
+				Err(err_msg) => Ok( Response::with(( status::InternalServerError, format!("X-Error: {}", err_msg) )) )
+		},
+		Err(err_msg) => Ok( Response::with(( status::BadRequest, format!("X-Error: {}", err_msg) )) )
+	}
 }

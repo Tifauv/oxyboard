@@ -4,6 +4,7 @@ extern crate time;
 use post::{Post,UserPost};
 use self::iron::typemap::Key;
 use self::time::{now,strftime};
+use std::result::Result;
 use std::slice::Iter;
 use std::vec::Vec;
 
@@ -29,11 +30,11 @@ impl History {
 	}
 
 
-	pub fn add(&mut self, p_user_post:UserPost) -> u32 {
+	pub fn add(&mut self, p_user_post:UserPost) -> Result<u32, &str> {
 		// Get the current time
 		let datetime = match strftime("%Y%m%d%H%M%S", &now()) {
 			Ok(x) => x,
-			Err(_) => panic!("Failed to format the current datetime as needed !"),
+			Err(_) => return Err("Failed to format the current datetime as needed !")
 		};
 
 		// Create the new Post
@@ -50,7 +51,7 @@ impl History {
 
 		// Increment the post id counter
 		self.next_post_id += 1;
-		post_id
+		Ok(post_id)
 	}
 
 
