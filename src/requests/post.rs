@@ -20,10 +20,11 @@ use std::result::Result;
  */
 fn make_user_post<'a>(p_request:&mut Request) -> Result<UserPost, &'a str> {
 	// Extract the user-agent
-	let user_agent = match p_request.headers.get::<UserAgent>() {
-		Some(ua) => ua.trim(),
-		None     => "Anonyme"
+	let mut user_agent = match p_request.headers.get::<UserAgent>() {
+		Some(ua) => ua.trim().to_string(),
+		None     => String::from("Anonyme")
 	};
+	user_agent.truncate(80);
 
 	// Extract the message
 	let mut body = String::new();
@@ -31,7 +32,7 @@ fn make_user_post<'a>(p_request:&mut Request) -> Result<UserPost, &'a str> {
 	match extract_message(&body) {
 		Some(msg) => Ok(UserPost {
 						login     : String::new(),
-						user_agent: user_agent.to_string(),
+						user_agent: user_agent,
 						message   : msg.trim().to_string()
 					}),
 		None      => Err("No message in the request")
