@@ -5,22 +5,26 @@ use post::{Post,UserPost};
 use self::iron::typemap::Key;
 use self::time::{now,strftime};
 use std::result::Result;
-use std::slice::Iter;
-use std::vec::Vec;
+use std::collections::vec_deque::{VecDeque,Iter};
 
 
+/**
+ * A History contains
+ */
 pub struct History {
-	posts: Vec<Post>,
-	max_size: usize,
-	next_post_id: u32,
+	posts        : VecDeque<Post>,
+	max_size     : usize,
+	next_post_id : u32,
+	events       : HistoryEventDispatcher
 }
 
 impl History {
 	pub fn new(p_max_size:usize) -> History {
 		History {
-			posts: Vec::new(),
-			max_size: p_max_size,
-			next_post_id: 1,
+			posts        : VecDeque::new(),
+			max_size     : p_max_size,
+			next_post_id : 1,
+			events       : HistoryEventDispatcher::new()
 		}
 	}
 
@@ -42,12 +46,14 @@ impl History {
 
 		// Remove the oldest post if the history will exceed its maximum size
 		if self.posts.len() >= self.max_size {
-			self.posts.remove(0);
+			//let oldest_post = self.posts.pop_front();
+			self.events.post_removed(&self.posts.pop_front().unwrap());
 		}
 
 		// Add the new post
 		let post_id = post.id();
-		self.posts.push(post);
+		self.posts.push_back(post);
+		self.events.post_added(&self.posts.back().unwrap());
 
 		// Increment the post id counter
 		self.next_post_id += 1;
@@ -62,4 +68,39 @@ impl History {
 
 impl Key for History {
 	type Value = History;
+}
+
+
+pub trait HistoryListener {
+	fn post_added(&self, p_post: &Post);
+	fn post_removed(&self, p_post: &Post);
+}
+
+
+struct HistoryEventDispatcher {
+	listeners: Vec<Box<HistoryListener + Send + Sync>>
+}
+
+impl HistoryEventDispatcher {
+	fn new() -> HistoryEventDispatcher {
+		HistoryEventDispatcher {
+			listeners : Vec::new()
+		}
+	}
+}
+
+impl HistoryListener for HistoryEventDispatcher {
+
+	fn post_added(&self, p_post: &Post) {
+		for listener in &self.listeners {
+			listener.post_added(p_post);
+		}
+	}
+
+
+	fn post_removed(&self, p_post: &Post) {
+		for listener in &self.listeners {
+			listener.post_removed(p_post);
+		}
+	}
 }
