@@ -23,7 +23,7 @@ fn main() {
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history
-	let mut history = History::new(512);
+	let history = History::new(512);
 	let mut chain = Chain::new(router);
 	chain.link(State::<History>::both(history));
 
