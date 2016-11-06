@@ -64,6 +64,11 @@ impl History {
 	pub fn iter(&self) -> Iter<Post> {
 		self.posts.iter()
 	}
+
+
+	pub fn add_listener(&mut self, p_listener: Box<HistoryListener + Send + Sync>) {
+		self.events.add_listener(p_listener);
+	}
 }
 
 impl Key for History {
@@ -71,6 +76,13 @@ impl Key for History {
 }
 
 
+/**
+ * A `HistoryListener` is the interface for listening `History` events.
+ *
+ * Currently, this includes:
+ * *post_added: a new message has been added to the history,
+ * *post_removed: the oldest message has been removed from the history.
+ */
 pub trait HistoryListener {
 	fn post_added(&self, p_post: &Post);
 	fn post_removed(&self, p_post: &Post);
@@ -86,6 +98,13 @@ impl HistoryEventDispatcher {
 		HistoryEventDispatcher {
 			listeners : Vec::new()
 		}
+	}
+
+	/**
+	 * Adds a listener to this dispatcher.
+	 */
+	fn add_listener(&mut self, p_listener: Box<HistoryListener + Send + Sync>) {
+		self.listeners.push(p_listener);
 	}
 }
 
