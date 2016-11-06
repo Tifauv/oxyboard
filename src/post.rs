@@ -1,5 +1,5 @@
 /*!
- * A `post` in the history.
+ * A `post` is a message sent by a user and its associated metadata.
  *
  * This module contains two types, `UserPost` and `Post`.
  * The `UserPost` is responsible for extracting data from the HTTP request
@@ -51,9 +51,9 @@
  	 */
  	pub fn new(p_login:String, p_user_agent:String, p_message:String) -> UserPost {
  		UserPost {
- 			login     : p_login,
- 			user_agent: p_user_agent,
- 			message   : p_message,
+ 			login      : p_login,
+ 			user_agent : p_user_agent,
+ 			message    : p_message,
  		}
  	}
  }
@@ -114,11 +114,11 @@ impl Post {
 	 */
 	pub fn new(p_id:u32, p_datetime:String, p_parser:UserPost) -> Post {
 		Post {
-			id        : p_id,
-			time      : p_datetime,
-			login     : p_parser.login,
-			user_agent: p_parser.user_agent,
-			message   : p_parser.message,
+			id         : p_id,
+			time       : p_datetime,
+			login      : p_parser.login,
+			user_agent : p_parser.user_agent,
+			message    : p_parser.message
 		}
 	}
 
