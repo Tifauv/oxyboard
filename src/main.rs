@@ -7,6 +7,7 @@ use iron::prelude::*;
 use oxyboard::history::History;
 use oxyboard::requests::backend;
 use oxyboard::requests::post;
+use oxyboard::storage::file_csv::CsvFileStorage;
 use persistent::State;
 use router::Router;
 
@@ -22,8 +23,14 @@ fn main() {
 	router.get("/backend", backend::backend_handler, "backend_xml");
 	router.post("/post",   post::post_handler,       "post_message");
 
+	// Create the history storage engine
+	let history_storage = CsvFileStorage::new(String::from(""));
+
 	// Create the history
-	let history = History::new(512);
+	let mut history = History::new(512);
+	history.add_listener(Box::new(history_storage));
+
+	// Store the history in the shared state
 	let mut chain = Chain::new(router);
 	chain.link(State::<History>::both(history));
 
