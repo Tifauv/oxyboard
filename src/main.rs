@@ -24,7 +24,7 @@ fn main() {
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history storage engine
-	let history_storage = CsvFileStorage::new(String::from(""));
+	let history_storage = CsvFileStorage::new(String::from("./history.csv"));
 
 	// Create the history
 	let mut history = History::new(512);

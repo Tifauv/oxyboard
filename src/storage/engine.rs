@@ -3,7 +3,8 @@
  */
  
 use post::Post;
+use std::io;
 
 pub trait StorageEngine {
-	fn store(&self, p_post: &Post);
+	fn store(&self, p_post: &Post) -> Result<&Self, io::Error>;
 }
