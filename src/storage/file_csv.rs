@@ -26,7 +26,7 @@ impl CsvFileStorage {
 	 * Converts a post to its CSV description.
 	 */
 	fn post_to_csv(p_post: &Post) -> String {
-		format!("\"{id}\";\"{time}\";\"{info}\";\"{user}\";\"{msg}\"",
+		format!("\"{id}\";\"{time}\";\"{info}\";\"{user}\";\"{msg}\"\n",
 				id   = p_post.id(),
 				time = p_post.time(),
 				info = p_post.user_agent(),
@@ -38,7 +38,7 @@ impl CsvFileStorage {
 impl StorageEngine for CsvFileStorage {
 	fn store(&self, p_post: &Post) -> Result<&Self, io::Error> {
 		let mut file = try!(OpenOptions::new()
-				.write(true)
+				.create(true)
 				.append(true)
 				.open(&self.path));
 		let post_csv = CsvFileStorage::post_to_csv(p_post);
