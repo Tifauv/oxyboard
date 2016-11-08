@@ -4,6 +4,8 @@ extern crate persistent;
 extern crate router;
 
 use iron::prelude::*;
+use oxyboard::config::{ConfigLoader};
+use oxyboard::config::toml_cfg::TomlConfigLoader;
 use oxyboard::history::History;
 use oxyboard::requests::backend;
 use oxyboard::requests::post;
@@ -16,7 +18,18 @@ use router::Router;
  * Main function that sets the Iron server up and starts it.
  */
 fn main() {
-	let listen_address = "localhost:8080";
+	// Load the configuration
+	let config = match TomlConfigLoader::new(String::from("")).load() {
+		Ok(x) => x,
+		Err(e) => {
+			println!("Failed to read the configuration: {}", e);
+			return;
+		}
+	};
+
+	let listen_address = format!("{ip}:{port}",
+			ip   = config.server.ip,
+			port = config.server.port);
 
 	// Create the request router
 	let mut router = Router::new();
@@ -24,10 +37,11 @@ fn main() {
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history storage engine
-	let history_storage = CsvFileStorage::new(String::from("./history.csv"));
+	let history_storage = CsvFileStorage::new(format!("{data_dir}/history.csv",
+			data_dir = config.storage.data_dir));
 
 	// Create the history
-	let mut history = History::new(512);
+	let mut history = History::new(config.board.history_size);
 	history.add_listener(Box::new(history_storage));
 
 	// Store the history in the shared state
@@ -39,5 +53,5 @@ fn main() {
 	println!("  - backend: http://{}/backend", listen_address);
 	println!("  - port   : http://{}/post"   , listen_address);
 	println!("Use Ctrl-C to abort.");
-	Iron::new(chain).http(listen_address).unwrap();
+	Iron::new(chain).http(&listen_address[..]).unwrap();
 }
