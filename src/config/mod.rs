@@ -43,7 +43,7 @@ pub struct StorageConfig {
  * This trait defines the common interface to configuration backends.
  */
 pub trait ConfigLoader {
-	fn load(&self) -> Result<Config, &str>;
+	fn load(&self) -> Result<Config, String>;
 }
 
 
