@@ -37,8 +37,7 @@ fn main() {
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history storage engine
-	let history_storage = CsvFileStorage::new(format!("{data_dir}/history.csv",
-			data_dir = config.storage.data_dir));
+	let history_storage = CsvFileStorage::new(config.storage.data_dir, String::from("history.csv"));
 
 	// Create the history
 	let mut history = History::new(config.board.history_size);
