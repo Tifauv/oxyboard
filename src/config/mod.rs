@@ -146,4 +146,4 @@ pub trait ConfigLoader {
 
 
 // The loaders are defined in sub-modules
-pub mod toml_cfg;
+pub mod toml;

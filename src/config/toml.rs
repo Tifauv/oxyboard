@@ -34,7 +34,7 @@ impl TomlConfigLoader {
 			history_size = 512
 
 			[storage]
-			data_dir = "."
+			data_dir = "data"
 		"#))
 	}
 }

@@ -6,7 +6,7 @@ extern crate router;
 use iron::prelude::*;
 use oxyboard::config;
 use oxyboard::config::ConfigLoader;
-use oxyboard::config::toml_cfg::TomlConfigLoader;
+use oxyboard::config::toml::TomlConfigLoader;
 use oxyboard::history::History;
 use oxyboard::requests::backend;
 use oxyboard::requests::post;
