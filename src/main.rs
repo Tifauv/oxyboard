@@ -40,7 +40,7 @@ fn main() {
 	let history_storage = CsvFileStorage::new(config.storage.data_dir, String::from("history.csv"));
 
 	// Create the history
-	let mut history = History::new(config.board.history_size);
+	let mut history = History::new(&config.board.name, config.board.history_size);
 	history.add_listener(Box::new(history_storage));
 
 	// Store the history in the shared state
@@ -48,7 +48,7 @@ fn main() {
 	chain.link(State::<History>::both(history));
 
 	// Start the server
-	println!("Starting board...");
+	println!("Starting board '{}'..."        , config.board.name);
 	println!("  - backend: http://{}/backend", listen_address);
 	println!("  - port   : http://{}/post"   , listen_address);
 	println!("Use Ctrl-C to abort.");

@@ -12,6 +12,7 @@ use std::collections::vec_deque::{VecDeque,Iter};
  * A History contains
  */
 pub struct History {
+	board_name   : String,
 	posts        : VecDeque<Post>,
 	max_size     : usize,
 	next_post_id : u32,
@@ -19,13 +20,19 @@ pub struct History {
 }
 
 impl History {
-	pub fn new(p_max_size:usize) -> History {
+	pub fn new(p_name: &String, p_max_size: usize) -> History {
 		History {
+			board_name   : p_name.clone(),
 			posts        : VecDeque::new(),
 			max_size     : p_max_size,
 			next_post_id : 1,
 			events       : HistoryEventDispatcher::new()
 		}
+	}
+
+
+	pub fn board_name(&self) -> &String {
+		&self.board_name
 	}
 
 

@@ -20,7 +20,8 @@ pub fn backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	let history = lock.read().unwrap();
 
 	// Build the backend
-	let mut backend_xml = String::from("<?xml version=\"1.0\" encoding=\"utf-8\"?><board>\n");
+	let mut backend_xml = String::from("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+	backend_xml = backend_xml + &format!("<board site=\"{}\">\n", history.board_name());
 	for post in history.iter() {
 		backend_xml = backend_xml + &format!("<post id=\"{}\" time=\"{}\">", post.id(), post.time());
 		backend_xml = backend_xml + &format!("<info><![CDATA[{}]]></info>", post.user_agent());
