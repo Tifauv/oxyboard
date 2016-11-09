@@ -4,7 +4,8 @@ extern crate persistent;
 extern crate router;
 
 use iron::prelude::*;
-use oxyboard::config::{ConfigLoader};
+use oxyboard::config;
+use oxyboard::config::ConfigLoader;
 use oxyboard::config::toml_cfg::TomlConfigLoader;
 use oxyboard::history::History;
 use oxyboard::requests::backend;
@@ -19,11 +20,12 @@ use router::Router;
  */
 fn main() {
 	// Load the configuration
-	let config = match TomlConfigLoader::new(String::from("")).load() {
+	let config = match TomlConfigLoader::new(String::from("oxyboard.toml")).load() {
 		Ok(x) => x,
 		Err(e) => {
-			println!("Failed to read the configuration: {}", e);
-			return;
+			println!("/!\\ Configuration error: {}", e);
+			println!("(i) Using default hardcoded configuration instead.");
+			config::default()
 		}
 	};
 
