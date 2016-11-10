@@ -1,8 +1,10 @@
+extern crate clap;
 extern crate iron;
 extern crate oxyboard;
 extern crate persistent;
 extern crate router;
 
+use clap::{Arg, App};
 use iron::prelude::*;
 use oxyboard::config;
 use oxyboard::config::{Config,ConfigLoader};
@@ -41,8 +43,20 @@ fn load_config(p_file: &str) -> Config {
  * Main function that sets the Iron server up and starts it.
  */
 fn main() {
-	// Load the configuration
-	let config_file = "config/oxyboard.toml";
+	let matches = App::new("Oxyboard")
+	    	.version("0.1.0")
+	        .author("Olivier Serve <tifauv@gmail.com>")
+	        .about("A board server written in Rust. With clocks !")
+	        .arg(Arg::with_name("config")
+	            .short("c")
+	            .long("config")
+	            .value_name("FILE")
+	            .help("Sets a custom config file")
+	            .takes_value(true))
+	      	.get_matches();
+
+	// Gets a value for config if supplied by user, or defaults to "default.conf"
+	let config_file = matches.value_of("config").unwrap_or("config/oxyboard.conf");
 	let config = load_config(&config_file);
 
 	// Create the request router
@@ -62,7 +76,10 @@ fn main() {
 	chain.link(State::<History>::both(history));
 
 	// Start the server
-	println!("\u{24d8} Board '{}' about to start.", config.board.name);
+	println!("\u{24d8} Board '{name}' about to start listening on {ip}:{port}.",
+			name = config.board.name,
+			ip   = config.server.ip,
+			port = config.server.port);
 	println!("\u{24d8} Use Ctrl-C to abort.");
 	Iron::new(chain).http((config.server.ip.as_ref(), config.server.port)).unwrap();
 }

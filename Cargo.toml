@@ -4,12 +4,13 @@ version = "0.1.0"
 authors = [ "Olivier Serve <tifauv@gmail.com>" ]
 
 [dependencies]
-time            = "*"
+clap            = "*"
 iron            = "*"
-router          = "*"
 persistent      = "*"
-toml            = "*"
+router          = "*"
 rustc-serialize = "*"
+time            = "*"
+toml            = "*"
 
 [[bin]]
 name = "oxyboard"
