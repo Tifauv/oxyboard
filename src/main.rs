@@ -22,7 +22,7 @@ use std::io::Error;
  */
 fn main() {
 	// Load the configuration
-	let config_file = "config/oxybofard.toml";
+	let config_file = "config/oxyboard.toml";
 	let config = TomlConfigLoader::new(String::from(config_file)).load()
 			.and_then(|c: Config| {
 				println!("\u{24d8} Configuration read from '{}'", config_file);
