@@ -1,3 +1,6 @@
+/*!
+ * The configuration data structure and loaders.
+ */
 
 /**
  * This the root of the configuration structure.
@@ -138,7 +141,7 @@ pub fn default() -> Config {
 
 
 /**
- * This trait defines the common interface to configuration backends.
+ * Defines the common interface to configuration loaders.
  */
 pub trait ConfigLoader {
 	fn load(&self) -> Result<Config, String>;

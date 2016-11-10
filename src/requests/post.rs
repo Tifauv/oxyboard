@@ -1,16 +1,13 @@
 /*!
- * The functions that handle a post request.
+ * The handlers for post requests.
  */
 
-extern crate iron;
-extern crate persistent;
-
-use self::iron::status;
 use history::History;
+use iron::headers::UserAgent;
+use iron::prelude::*;
+use iron::status;
+use persistent::State;
 use post::UserPost;
-use self::persistent::State;
-use self::iron::headers::UserAgent;
-use self::iron::prelude::*;
 use std::io::Read;
 use std::result::Result;
 
@@ -55,7 +52,7 @@ fn extract_message(p_req_body:&String) -> Option<&str> {
 
 
 /**
- * Handler function that manages the message reception.
+ * Handler for POST message requests.
  *
  * Extracts the data from the request needed to build a `UserPost` then
  * adds it to the `History` in the request's state. The id assigned to the

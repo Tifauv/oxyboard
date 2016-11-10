@@ -1,18 +1,17 @@
 /*!
- * The functions that handle a backend request.
+ * The handlers for backend requests.
  */
 
-extern crate iron;
-extern crate persistent;
-
-use self::iron::status;
 use history::History;
-use self::persistent::State;
-use self::iron::prelude::*;
+use iron::prelude::*;
+use iron::status;
+use persistent::State;
 
 
 /**
- * Handler function that returns the backend data.
+ * Handler for GET backend requests.
+ *
+ * Builds the XML backend and returns it.
  */
 pub fn backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	// Get access to the the shared history

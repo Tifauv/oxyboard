@@ -1,13 +1,10 @@
 /*!
- * History container and Listener definition.
+ * The history container and listener.
  */
 
-extern crate iron;
-extern crate time;
-
 use post::{Post,UserPost};
-use self::iron::typemap::Key;
-use self::time::{now,strftime};
+use iron::typemap::Key;
+use time::{now,strftime};
 use std::result::Result;
 use std::collections::vec_deque::{VecDeque,Iter};
 

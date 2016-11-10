@@ -1,5 +1,5 @@
 /*!
- * A `post` is a message sent by a user and its associated metadata.
+ * The representations of a message and its metadata.
  *
  * This module contains two types, `UserPost` and `Post`.
  * The `UserPost` is responsible for extracting data from the HTTP request

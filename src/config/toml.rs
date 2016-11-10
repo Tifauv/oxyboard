@@ -1,10 +1,9 @@
 /*!
  * Loads the configuration from a TOML file.
  */
-extern crate toml;
 
 use config::{Config,ConfigLoader};
-use self::toml::{Parser,Value};
+use toml::{decode,Parser,Value};
 
 
 pub struct TomlConfigLoader {
@@ -50,7 +49,7 @@ impl ConfigLoader for TomlConfigLoader {
 		let mut parser = Parser::new(&file_content);
 		match parser.parse() {
 			Some(decoded) => {
-				match toml::decode(Value::Table(decoded)) {
+				match decode(Value::Table(decoded)) {
 					Some(config) => Ok(config),
 					None => Err(String::from("Invalid configuration"))
 				}
