@@ -18,21 +18,32 @@ use std::io::Error;
 
 
 /**
+ * Loads the configuration from the given file.
+ *
+ * If the configuration cannot be loaded, the default configuration from
+ * `oxyboard::config::default()` is returned.
+ */
+fn load_config(p_file: &str) -> Config {
+	TomlConfigLoader::new(String::from(p_file)).load()
+			.and_then(|c: Config| {
+				println!("\u{24d8} Configuration read from '{}'", p_file);
+				Ok(c)
+			})
+			.or_else(|e: Error| -> io::Result<Config> {
+				println!("\u{26A0} Failed to read the configuration from '{}': {}", p_file, e);
+				println!("\u{24d8} Using default hardcoded configuration instead.");
+				Ok(config::default())
+			}).unwrap()
+}
+
+
+/**
  * Main function that sets the Iron server up and starts it.
  */
 fn main() {
 	// Load the configuration
 	let config_file = "config/oxyboard.toml";
-	let config = TomlConfigLoader::new(String::from(config_file)).load()
-			.and_then(|c: Config| {
-				println!("\u{24d8} Configuration read from '{}'", config_file);
-				Ok(c)
-			})
-			.or_else(|e: Error| -> io::Result<Config> {
-				println!("\u{26A0} Failed to read the configuration from '{}': {}", config_file, e);
-				println!("\u{24d8} Using default hardcoded configuration instead.");
-				Ok(config::default())
-			}).unwrap();
+	let config = load_config(&config_file);
 
 	// Create the request router
 	let mut router = Router::new();
@@ -51,12 +62,7 @@ fn main() {
 	chain.link(State::<History>::both(history));
 
 	// Start the server
-	let listen_address = format!("{ip}:{port}",
-			ip   = config.server.ip,
-			port = config.server.port);
-	println!("\u{24d8} Starting board '{}'..."        , config.board.name);
-	println!("\u{24d8}  - backend: http://{}/backend", listen_address);
-	println!("\u{24d8}  - port   : http://{}/post"   , listen_address);
+	println!("\u{24d8} Board '{}' about to start.", config.board.name);
 	println!("\u{24d8} Use Ctrl-C to abort.");
 	Iron::new(chain).http((config.server.ip.as_ref(), config.server.port)).unwrap();
 }
