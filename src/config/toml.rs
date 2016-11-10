@@ -3,6 +3,10 @@
  */
 
 use config::{Config,ConfigLoader};
+use std::fs::File;
+use std::io;
+use std::io::prelude::*;
+use std::io::{BufReader,Error,ErrorKind};
 use toml::{decode,Parser,Value};
 
 
@@ -22,19 +26,12 @@ impl TomlConfigLoader {
 	/**
 	 * Reads the content of the configuration file.
 	 */
-	fn read_file(&self) -> Result<String, &str> {
-		Ok(String::from(r#"
-			[server]
-			ip = "127.0.0.1"
-			port = 8080
-
-			[board]
-			name = "oxyboard"
-			history_size = 512
-
-			[storage]
-			data_dir = "data"
-		"#))
+	fn read_file(&self) -> io::Result<String> {
+		let file = try!(File::open(&self.file));
+		let mut reader = BufReader::new(file);
+		let mut data = String::new();
+		try!(reader.read_to_string(&mut data));
+		Ok(data)
 	}
 }
 
@@ -43,7 +40,7 @@ impl ConfigLoader for TomlConfigLoader {
 	/**
 	 * Reads the configuration file and parses its content.
 	 */
-	fn load(&self) -> Result<Config, String> {
+	fn load(&self) -> io::Result<Config> {
 		let file_content = try!(self.read_file());
 
 		let mut parser = Parser::new(&file_content);
@@ -51,7 +48,7 @@ impl ConfigLoader for TomlConfigLoader {
 			Some(decoded) => {
 				match decode(Value::Table(decoded)) {
 					Some(config) => Ok(config),
-					None => Err(String::from("Invalid configuration"))
+					None => Err(Error::new(ErrorKind::InvalidData, "Invalid configuration"))
 				}
 			},
 			None => {
@@ -61,7 +58,7 @@ impl ConfigLoader for TomlConfigLoader {
                 	let (hiline, hicol) = parser.to_linecol(err.hi);
 					error_msg = error_msg + &format!(" [l{}c{}-l{}c{}: {}]", loline, locol, hiline, hicol, err.desc);
 				}
-				Err(error_msg)
+				Err(Error::new(ErrorKind::InvalidData, error_msg))
 			}
 		}
 	}

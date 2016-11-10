@@ -2,6 +2,9 @@
  * The configuration data structure and loaders.
  */
 
+use std::io;
+
+
 /**
  * This the root of the configuration structure.
  *
@@ -58,7 +61,7 @@ pub struct Config {
 #[derive(Debug,RustcDecodable)]
 pub struct ServerParams {
 	pub ip   : String,
-	pub port : u64,
+	pub port : u16,
 }
 
 
@@ -144,7 +147,7 @@ pub fn default() -> Config {
  * Defines the common interface to configuration loaders.
  */
 pub trait ConfigLoader {
-	fn load(&self) -> Result<Config, String>;
+	fn load(&self) -> io::Result<Config>;
 }
 
 

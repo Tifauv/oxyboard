@@ -13,6 +13,8 @@ use oxyboard::requests::post;
 use oxyboard::storage::file_csv::CsvFileStorage;
 use persistent::State;
 use router::Router;
+use std::io;
+use std::io::Error;
 
 
 /**
@@ -20,16 +22,17 @@ use router::Router;
  */
 fn main() {
 	// Load the configuration
-	let config = TomlConfigLoader::new(String::from("oxyboard.toml")).load()
-			.or_else(|e: String| -> Result<Config, String> {
-				println!("/!\\ Configuration error: {}", e);
-				println!("(i) Using default hardcoded configuration instead.");
+	let config_file = "config/oxybofard.toml";
+	let config = TomlConfigLoader::new(String::from(config_file)).load()
+			.and_then(|c: Config| {
+				println!("\u{24d8} Configuration read from '{}'", config_file);
+				Ok(c)
+			})
+			.or_else(|e: Error| -> io::Result<Config> {
+				println!("\u{26A0} Failed to read the configuration from '{}': {}", config_file, e);
+				println!("\u{24d8} Using default hardcoded configuration instead.");
 				Ok(config::default())
 			}).unwrap();
-
-	let listen_address = format!("{ip}:{port}",
-			ip   = config.server.ip,
-			port = config.server.port);
 
 	// Create the request router
 	let mut router = Router::new();
@@ -48,9 +51,12 @@ fn main() {
 	chain.link(State::<History>::both(history));
 
 	// Start the server
-	println!("Starting board '{}'..."        , config.board.name);
-	println!("  - backend: http://{}/backend", listen_address);
-	println!("  - port   : http://{}/post"   , listen_address);
-	println!("Use Ctrl-C to abort.");
-	Iron::new(chain).http(&listen_address[..]).unwrap();
+	let listen_address = format!("{ip}:{port}",
+			ip   = config.server.ip,
+			port = config.server.port);
+	println!("\u{24d8} Starting board '{}'..."        , config.board.name);
+	println!("\u{24d8}  - backend: http://{}/backend", listen_address);
+	println!("\u{24d8}  - port   : http://{}/post"   , listen_address);
+	println!("\u{24d8} Use Ctrl-C to abort.");
+	Iron::new(chain).http((config.server.ip.as_ref(), config.server.port)).unwrap();
 }
