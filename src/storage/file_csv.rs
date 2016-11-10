@@ -1,6 +1,6 @@
 use history::HistoryListener;
 use post::Post;
-use storage::engine::StorageEngine;
+use storage::StorageEngine;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
