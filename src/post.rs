@@ -8,7 +8,7 @@
 
 
  /**
-  * Extracts the data from a post request.
+  * Contains the data extracted from a post request.
   *
   * The `login` field is the account name of the author if the user is
   * authenticated.
@@ -20,6 +20,8 @@
   *
   * The `message` field contains the message content. It is retrieved form the
   * form-encoded POST data.
+  *
+  * All these fields are immutable.
   */
  pub struct UserPost {
  	/// The user's login (may be empty)
@@ -49,7 +51,7 @@
  	 * assert_eq!(request.message,    "Plop!");
  	 * ```
  	 */
- 	pub fn new(p_login:String, p_user_agent:String, p_message:String) -> UserPost {
+ 	pub fn new(p_login: String, p_user_agent: String, p_message: String) -> UserPost {
  		UserPost {
  			login      : p_login,
  			user_agent : p_user_agent,
@@ -62,12 +64,12 @@
 /**
  * Represents a post in the `History`.
  *
- * All the fields are immutableIt contains the same data as `UserPost` and adds two metadata, `id` and `time`.
+ * A `Post` adds two fields to a `UserPost`, `id` and `time`.
  *
  * The `id` field is a unique identifier of the post. It can be used to track responses to a
  * message.
  *
- * The `time` field is a datetime that follows the format "yyyymmddhhMMss". It is the official
+ * The `time` field is a (non-unique) datetime that follows the format "YYYYmmddHHMMSS". It is the official
  * timestamp of the post. It can also be used to track responses to a message.
  *
  * The `login` field is the account name of the author if the user is
@@ -78,14 +80,13 @@
  * can be modified at will by browser extensions or dedicated clients, it is
  * easy to set and modify, even if it cannot provide a verified identity.
  *
- * The `message` field contains the message content. It is retrieved form the
- * form-encoded POST data.
+ * The `message` field contains the message content.
  *
- * A `Post` is created from a `UserPost` when the later is added to the `History`.
+ * All these fields are immutable.
  */
 pub struct Post {
 	/// The post's unique identifier
-	id: u32,
+	id: u64,
 	/// The datetime when the post was added to the history
 	time: String,
 	/// The user's login (may be empty)
@@ -112,7 +113,7 @@ impl Post {
 	 * let post = Post::new(42, String::from("20161026120000"), request);
 	 * ```
 	 */
-	pub fn new(p_id:u32, p_datetime:String, p_parser:UserPost) -> Post {
+	pub fn new(p_id: u64, p_datetime: String, p_parser: UserPost) -> Post {
 		Post {
 			id         : p_id,
 			time       : p_datetime,
@@ -137,7 +138,7 @@ impl Post {
 	 * assert_eq!(post.id(), 42);
 	 * ```
 	 */
-	pub fn id(&self) -> u32 {
+	pub fn id(&self) -> u64 {
 		self.id
 	}
 
