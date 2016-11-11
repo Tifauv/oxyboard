@@ -2,12 +2,12 @@
  * Loads the configuration from a TOML file.
  */
 
-use config::{Config,ConfigLoader};
+use config::{Config, ConfigLoader};
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
-use std::io::{BufReader,Error,ErrorKind};
-use toml::{decode,Parser,Value};
+use std::io::{BufReader, Error, ErrorKind};
+use toml::{decode, Parser, Value};
 
 
 pub struct TomlConfigLoader {

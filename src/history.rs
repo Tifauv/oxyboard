@@ -2,11 +2,11 @@
  * The history container and listener.
  */
 
-use post::{Post,UserPost};
+use post::{Post, UserPost};
 use iron::typemap::Key;
-use time::{now,strftime};
+use time::{now, strftime};
 use std::result::Result;
-use std::collections::vec_deque::{VecDeque,Iter};
+use std::collections::vec_deque::{VecDeque, Iter};
 
 
 /**
