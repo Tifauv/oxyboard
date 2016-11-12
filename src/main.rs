@@ -55,8 +55,8 @@ fn main() {
 	            .takes_value(true))
 	      	.get_matches();
 
-	// Gets a value for config if supplied by user, or defaults to "config/oxyboard.conf"
-	let config_file = matches.value_of("config").unwrap_or("config/oxyboard.conf");
+	// Gets a value for config if supplied by user, or defaults to "config/oxyboard.toml"
+	let config_file = matches.value_of("config").unwrap_or("config/oxyboard.toml");
 	let config = load_config(&config_file);
 
 	// Create the request router
