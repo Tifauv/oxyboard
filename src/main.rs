@@ -20,6 +20,26 @@ use std::io::Error;
 
 
 /**
+ * This macro prints an infomation message prefixed by Unicode character
+ * 'CIRCLED LATIN SMALL LETTER I' (U+24D8).
+ */
+macro_rules! info_msg {
+	( $tmpl: tt )               => ( println!(concat!("\u{24d8} ", $tmpl)) );
+	( $tmpl: tt, $($arg: tt)* ) => ( println!(concat!("\u{24d8} ", $tmpl), $($arg)*) )
+}
+
+
+/**
+ * This macro prints a warning message prefixed by Unicode character
+ * 'WARNING SIGN' (U+26A0).
+ */
+macro_rules! warn_msg {
+	( $tmpl: tt )               => ( println!(concat!("\u{26a0} ", $tmpl)) );
+	( $tmpl: tt, $($arg: tt)* ) => ( println!(concat!("\u{26a0} ", $tmpl), $($arg)*) )
+}
+
+
+/**
  * Loads the configuration from the given file.
  *
  * If the configuration cannot be loaded, the default configuration from
@@ -28,12 +48,12 @@ use std::io::Error;
 fn load_config(p_file: &str) -> Config {
 	TomlConfigLoader::new(String::from(p_file)).load()
 			.and_then(|c: Config| {
-				println!("\u{24d8} Configuration read from '{}'", p_file);
+				info_msg!("Configuration read from '{}'", p_file);
 				Ok(c)
 			})
 			.or_else(|e: Error| -> io::Result<Config> {
-				println!("\u{26A0} Failed to read the configuration from '{}': {}", p_file, e);
-				println!("\u{24d8} Using default hardcoded configuration instead.");
+				warn_msg!("Failed to read the configuration from '{}': {}", p_file, e);
+				info_msg!("Using default hardcoded configuration instead.");
 				Ok(config::default())
 			}).unwrap()
 }
@@ -76,10 +96,10 @@ fn main() {
 	chain.link(State::<History>::both(history));
 
 	// Start the server
-	println!("\u{24d8} Board '{name}' about to start listening on {ip}:{port}.",
+	info_msg!("Board '{name}' about to start listening on {ip}:{port}.",
 			name = config.board.name,
 			ip   = config.server.ip,
 			port = config.server.port);
-	println!("\u{24d8} Use Ctrl-C to abort.");
+	info_msg!("Use Ctrl-C to abort.");
 	Iron::new(chain).http((config.server.ip.as_ref(), config.server.port)).unwrap();
 }
