@@ -1,10 +1,8 @@
-use history::HistoryListener;
 use post::Post;
 use storage::StorageBackend;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::error::Error;
 use std::io;
 
 
@@ -62,20 +60,5 @@ impl StorageBackend for CsvFileStorage {
 		let post_csv = CsvFileStorage::post_to_csv(p_post);
 		try!(file.write_all(post_csv.as_bytes()));
 		Ok(self)
-	}
-}
-
-
-impl HistoryListener for CsvFileStorage {
-	fn post_added(&self, p_post: &Post) {
-		match self.store(p_post) {
-			Ok(_)  => {},
-			Err(e) => println!("Error: {}", e.description())
-		}
-	}
-
-
-	fn post_removed(&self, _: &Post) {
-		//
 	}
 }

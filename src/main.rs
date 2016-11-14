@@ -1,5 +1,6 @@
 extern crate clap;
 extern crate iron;
+#[macro_use]
 extern crate oxyboard;
 extern crate persistent;
 extern crate router;
@@ -10,6 +11,7 @@ use oxyboard::config;
 use oxyboard::config::{Config, ConfigLoader};
 use oxyboard::config::toml::TomlConfigLoader;
 use oxyboard::history::History;
+use oxyboard::history_recorder::HistoryRecorder;
 use oxyboard::requests::backend;
 use oxyboard::requests::post;
 use oxyboard::storage::file_csv::CsvFileStorage;
@@ -17,26 +19,6 @@ use persistent::State;
 use router::Router;
 use std::io;
 use std::io::Error;
-
-
-/**
- * This macro prints an infomation message prefixed by Unicode character
- * 'CIRCLED LATIN SMALL LETTER I' (U+24D8).
- */
-macro_rules! info_msg {
-	( $tmpl: tt )               => ( println!(concat!("\u{24d8} ", $tmpl)) );
-	( $tmpl: tt, $($arg: tt)* ) => ( println!(concat!("\u{24d8} ", $tmpl), $($arg)*) )
-}
-
-
-/**
- * This macro prints a warning message prefixed by Unicode character
- * 'WARNING SIGN' (U+26A0).
- */
-macro_rules! warn_msg {
-	( $tmpl: tt )               => ( println!(concat!("\u{26a0} ", $tmpl)) );
-	( $tmpl: tt, $($arg: tt)* ) => ( println!(concat!("\u{26a0} ", $tmpl), $($arg)*) )
-}
 
 
 /**
@@ -86,10 +68,11 @@ fn main() {
 
 	// Create the history storage engine
 	let history_storage = CsvFileStorage::new(config.storage.data_dir, String::from("history.csv"));
+	let history_recorder = HistoryRecorder::new(history_storage);
 
 	// Create the history
 	let mut history = History::new(&config.board.name, config.board.history_size);
-	history.add_listener(Box::new(history_storage));
+	history.add_listener(Box::new(history_recorder));
 
 	// Store the history in the shared state
 	let mut chain = Chain::new(router);
