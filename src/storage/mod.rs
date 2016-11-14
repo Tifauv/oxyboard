@@ -6,9 +6,9 @@ use post::Post;
 use std::io;
 
 /**
- * Common interface for storage engines.
+ * Common interface for storage backends.
  */
-pub trait StorageEngine {
+pub trait StorageBackend {
 	/**
 	 * Stores a post.
 	 */
@@ -16,5 +16,5 @@ pub trait StorageEngine {
 }
 
 
-// The storage engines are defined in sub-modules
+// The storage backends are defined in sub-modules
 pub mod file_csv;
