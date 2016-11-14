@@ -96,10 +96,9 @@ fn main() {
 	chain.link(State::<History>::both(history));
 
 	// Start the server
-	info_msg!("Board '{name}' about to start listening on {ip}:{port}.",
+	let _server = Iron::new(chain).http((config.server.ip.as_ref(), config.server.port)).unwrap();
+	info_msg!("Board '{name}' listening on {ip}:{port}. Use Ctrl-C to abort.",
 			name = config.board.name,
 			ip   = config.server.ip,
 			port = config.server.port);
-	info_msg!("Use Ctrl-C to abort.");
-	Iron::new(chain).http((config.server.ip.as_ref(), config.server.port)).unwrap();
 }
