@@ -65,7 +65,7 @@ pub fn post_handler(p_request: &mut Request) -> IronResult<Response> {
 
 	// Store the message and return the post id
 	match make_user_post(p_request) {
-		Ok(user_post) => match history.add(user_post) {
+		Ok(user_post) => match history.add_post(user_post) {
 				Ok(post_id)  => Ok( Response::with(( status::Created, format!("X-Post-Id: {}", post_id) )) ),
 				Err(err_msg) => Ok( Response::with(( status::InternalServerError, format!("X-Error: {}", err_msg) )) )
 		},

@@ -5,6 +5,7 @@ authors = [ "Olivier Serve <tifauv@gmail.com>" ]
 
 [dependencies]
 clap            = "*"
+csv             = "*"
 iron            = "*"
 persistent      = "*"
 router          = "*"

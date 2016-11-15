@@ -1,3 +1,4 @@
+extern crate csv;
 extern crate iron;
 extern crate persistent;
 extern crate rustc_serialize;

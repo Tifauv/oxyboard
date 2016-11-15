@@ -14,11 +14,13 @@ use oxyboard::history::History;
 use oxyboard::history_recorder::HistoryRecorder;
 use oxyboard::requests::backend;
 use oxyboard::requests::post;
+use oxyboard::storage::StorageBackend;
 use oxyboard::storage::file_csv::CsvFileStorage;
 use persistent::State;
 use router::Router;
 use std::io;
 use std::io::Error;
+use std::path::Path;
 
 
 /**
@@ -68,10 +70,20 @@ fn main() {
 
 	// Create the history storage engine
 	let history_storage = CsvFileStorage::new(config.storage.data_dir, String::from("history.csv"));
-	let history_recorder = HistoryRecorder::new(history_storage);
 
 	// Create the history
 	let mut history = History::new(&config.board.name, config.board.history_size);
+
+	// Load the history data if any
+	if Path::new(&history_storage.file_path()).exists() {
+		match history_storage.load_history(&mut history) {
+			Ok(n)  => info_msg!("{} posts loaded from history file '{}'.", n, &history_storage.file_path()),
+			Err(e) => warn_msg!("Failed to load the last history: {}", e)
+		}
+	}
+
+	// Add the listeners
+	let history_recorder = HistoryRecorder::new(history_storage);
 	history.add_listener(Box::new(history_recorder));
 
 	// Store the history in the shared state

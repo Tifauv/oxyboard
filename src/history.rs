@@ -81,6 +81,34 @@ impl History {
 
 
 	/**
+	 * Appends a full post at the end of the history.
+	 *
+	 * The given `Post` is added as-is. This function is meant to be used
+	 * when loading from storage data.
+	 *
+	 * The main differences with `add_post` are:
+	 * * it does not create the id and timestamp
+	 * * the internal `next_post_id` is set to the given post's `id` + 1
+	 * * no listener is called
+	 * * it doesn't return anything
+	 */
+	pub fn add_full_post(&mut self, p_post: Post) {
+		// Remove the oldest post if the history will exceed its maximum size
+		if self.posts.len() >= self.max_size {
+			self.events.post_removed(&self.posts.pop_front().unwrap());
+		}
+
+		// Add the new post
+		let post_id = p_post.id();
+		self.posts.push_back(p_post);
+		self.events.post_added(&self.posts.back().unwrap());
+
+		// Increment the post id counter
+		self.next_post_id = post_id + 1;
+	}
+
+
+	/**
 	 * Appends a post at the end of the history.
 	 *
 	 * The given `UserPost` is converted into a `Post` by giving it
@@ -109,12 +137,12 @@ impl History {
 	 * let post = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 *
 	 * // Add the post to the history
-	 * let post_id = hist.add(post).unwrap();
+	 * let post_id = hist.add_post(post).unwrap();
 	 * assert_eq!(post_id, 1);
 	 * assert_eq!(hist.size(), 1);
 	 * ```
 	 */
-	pub fn add(&mut self, p_user_post: UserPost) -> Result<u64, &str> {
+	pub fn add_post(&mut self, p_user_post: UserPost) -> Result<u64, &str> {
 		// Get the current time
 		let datetime = match strftime("%Y%m%d%H%M%S", &now()) {
 			Ok(x) => x,
