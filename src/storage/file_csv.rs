@@ -8,7 +8,6 @@ use storage::StorageBackend;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io;
-use std::io::ErrorKind;
 use std::io::prelude::*;
 
 
@@ -104,16 +103,8 @@ impl StorageBackend for CsvFileStorage {
 	 *
 	 */
 	fn load_history(&self, p_history: &mut History) -> io::Result<usize> {
-		let mut reader = match csv::Reader::from_file(&self.file_path()) {
-				Ok(r)  => r.has_headers(false),
-				Err(e) => return match e {
-					csv::Error::Encode(msg) => Err(io::Error::new(ErrorKind::Other, msg)),
-					csv::Error::Decode(msg) => Err(io::Error::new(ErrorKind::Other, msg)),
-					csv::Error::Index(msg)  => Err(io::Error::new(ErrorKind::Other, msg)),
-					csv::Error::Parse(_)    => Err(io::Error::new(ErrorKind::Other, "Parse error")),
-					csv::Error::Io(err)     => Err(err),
-				}
-		};
+		let mut reader = csv::Reader::from_reader(try!(fs::File::open(&self.file_path())))
+				.has_headers(false);
 
 		let mut count = 0;
 		for line in reader.decode() {
