@@ -78,7 +78,7 @@ fn main() {
 	if Path::new(&history_storage.file_path()).exists() {
 		match history_storage.load_history(&mut history) {
 			Ok(n)  => info_msg!("{} posts loaded from history file '{}'.", n, &history_storage.file_path()),
-			Err(e) => warn_msg!("Failed to load the last history: {}", e)
+			Err(e) => warn_msg!("Failed to load the history file '{}': {}", &history_storage.file_path(), e)
 		}
 	}
 
