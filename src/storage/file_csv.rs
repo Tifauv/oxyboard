@@ -8,7 +8,7 @@ use storage::StorageBackend;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io;
-use std::io::prelude::*;
+use std::io::ErrorKind;
 
 
 /**
@@ -60,19 +60,6 @@ impl CsvFileStorage {
 				dir = self.dir,
 				file = self.file)
 	}
-
-
-	/**
-	 * Creates a CSV representation for a post.
-	 */
-	fn post_to_csv(p_post: &Post) -> String {
-		format!("\"{id}\",\"{time}\",\"{info}\",\"{user}\",\"{msg}\"\n",
-				id   = p_post.id(),
-				time = p_post.time(),
-				info = p_post.user_agent(),
-				user = p_post.login(),
-				msg  = p_post.message())
-	}
 }
 
 impl StorageBackend for CsvFileStorage {
@@ -82,15 +69,21 @@ impl StorageBackend for CsvFileStorage {
 	 * The output file is opened in append mode and closed at the end of the function.
 	 * It is created if needed, as is its directory path.
 	 */
-	fn store_post(&self, p_post: &Post) -> io::Result<&Self> {
+	fn save_post(&self, p_post: &Post) -> io::Result<&Self> {
 		try!(fs::create_dir_all(&self.dir));
-		let mut file = try!(OpenOptions::new()
-				.create(true)
-				.append(true)
-				.open(&self.file_path()));
-		let post_csv = CsvFileStorage::post_to_csv(p_post);
-		try!(file.write_all(post_csv.as_bytes()));
-		Ok(self)
+		let mut writer = csv::Writer::from_writer(
+				try!(OpenOptions::new()
+					.create(true)
+					.append(true)
+					.open(&self.file_path())));
+
+		writer.encode(p_post).and(Ok(self)).map_err(|e| {
+			match e {
+				csv::Error::Encode(msg) => io::Error::new(ErrorKind::Other, format!("Failed to encode line in history file '{}': {}", self.file_path(), msg)),
+				csv::Error::Io(err)     => err,
+				_                       => io::Error::new(ErrorKind::Other, "Error while saving post")
+			}
+		})
 	}
 
 

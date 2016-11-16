@@ -13,9 +13,9 @@ use std::io;
  */
 pub trait StorageBackend {
 	/**
-	 * Stores a post.
+	 * Saves a post.
 	 */
-	fn store_post(&self, p_post: &Post) -> io::Result<&Self>;
+	fn save_post(&self, p_post: &Post) -> io::Result<&Self>;
 
 
 	/**

@@ -29,7 +29,7 @@ impl<T: StorageBackend> HistoryListener for HistoryRecorder<T> {
 	 *
 	 */
 	fn post_added(&self, p_post: &Post) {
-		match self.storage.store_post(p_post) {
+		match self.storage.save_post(p_post) {
 			Ok(_)  => {},
 			Err(e) => warn_msg!("Failed to record post #{id}: {err}",
 					id  = p_post.id(),
