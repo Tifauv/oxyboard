@@ -28,7 +28,7 @@ Basically, a chat room needs two types of requests:
 
 _Details coming..._
 
-### Threading through timestamps
+### Threading through timestamps
 
 A _tribune_ has a notion of threads, based on message timestamps.
 Each message has a clickable timestamp (formatted as hh:mm:ss^sub).
@@ -39,7 +39,7 @@ She can also type the timestamp by hand, it is simply text at this point.
 
 For example, say Alice wants to respond to Bob:
 
-```  
+```
   | ...                                           |
   | Bob 12:00:42 - Hello !                        |
   |-----------------------------------------------|
@@ -64,7 +64,7 @@ This way, you can easily view all responses to a message.
 Likewise, hovering the timestamp reference '12:00:42' in Alice's message highlights Bob's message.
 This way, you can view the previous message in a discussion.
 
-Using this simple but powerfull mechanism, it is possible to follow multiple interleaved discussions. 
+Using this simple but powerfull mechanism, it is possible to follow multiple interleaved discussions.
 
 ```
   | ...                                           |
@@ -84,7 +84,7 @@ Then, you should [get the code on GitHub](https://github.com/Tifauv/oxyboard).
 A `cargo run` will take care of downloading the dependencies, building all that and starting a board
 on 0.0.0.0:8080.
 
-## Documentation
+## Documentation
 
 You can use `cargo doc` to locally build the documentation. It will be created in the target/doc directory.
 
