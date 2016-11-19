@@ -5,7 +5,7 @@ Oxyboard
 
 Oxyboard is a _tribune_, a sort of web-based chat room.
 
-It is written in [Rust](https://rust-lang.org) as a toy project to learn the language.
+It is written in [Rust](https://www.rust-lang.org) as a toy project to learn the language.
 The HTTP server part is handled by [Iron](https://github.com/iron/iron "Iron on GitHub").
 
 ## Features
