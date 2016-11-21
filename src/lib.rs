@@ -12,7 +12,7 @@
  * To create an empty history:
  *
  * ```
- * use oxyboard::history::History;
+ * use oxyboard::core::History;
  *
  * let board_name = String::from("Oxyboard");
  * let max_size = 1024;
@@ -22,7 +22,7 @@
  * To load some posts from a CSV file:
  *
  * ```
- * use oxyboard::history::History;
+ * use oxyboard::core::History;
  * use oxyboard::storage::StorageBackend;
  * use oxyboard::storage::file_csv::CsvFileStorage;
  *
@@ -74,8 +74,6 @@ macro_rules! warn_msg {
 
 
 pub mod config;
-pub mod history;
-pub mod history_recorder;
-pub mod post;
+pub mod core;
 pub mod requests;
 pub mod storage;

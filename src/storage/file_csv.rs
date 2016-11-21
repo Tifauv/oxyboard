@@ -2,8 +2,7 @@
  * The CSV storage backend.
  */
 use csv;
-use history::History;
-use post::Post;
+use core::{History, Post};
 use storage::StorageBackend;
 use std::fs;
 use std::fs::OpenOptions;
@@ -22,8 +21,7 @@ use std::io::ErrorKind;
  * For example, the following post
  *
  * ```
- * use oxyboard::post::UserPost;
- * use oxyboard::post::Post;
+ * use oxyboard::core::{Post, UserPost};
  *
  * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
  * let post = Post::new(42, String::from("20161026120000"), request);

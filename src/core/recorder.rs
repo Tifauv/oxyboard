@@ -1,5 +1,5 @@
-use history::HistoryListener;
-use post::Post;
+use core::history::HistoryListener;
+use core::post::Post;
 use std::error::Error;
 use storage::StorageBackend;
 

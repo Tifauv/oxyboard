@@ -2,7 +2,7 @@
  * The handlers for backend requests.
  */
 
-use history::History;
+use core::History;
 use iron::prelude::*;
 use iron::status;
 use persistent::State;

@@ -43,7 +43,7 @@
  	 * How to build an anonymous post request:
  	 *
  	 * ```
- 	 * use oxyboard::post::UserPost;
+ 	 * use oxyboard::core::UserPost;
  	 *
  	 * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
  	 * assert_eq!(request.login,      "");
@@ -107,8 +107,8 @@ impl Post {
 	 * This is how a `Post` is built from a `UserPost`:
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), request);
@@ -131,8 +131,8 @@ impl Post {
 	 * # Examples
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), request);
@@ -150,8 +150,8 @@ impl Post {
 	 * # Examples
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), request);
@@ -171,8 +171,8 @@ impl Post {
 	 * # Examples
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), request);
@@ -192,8 +192,8 @@ impl Post {
 	 * # Examples
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), request);
@@ -211,8 +211,8 @@ impl Post {
 	 * # Examples
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), request);
@@ -232,8 +232,8 @@ impl Post {
 	 * Example for an anonymous post:
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let msg = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), msg);
@@ -243,8 +243,8 @@ impl Post {
 	 * Example for an authenticated post:
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::post::Post;
+	 * use oxyboard::core::UserPost;
+	 * use oxyboard::core::Post;
 	 *
 	 * let msg = UserPost::new(String::from("ptramo"), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	 * let post = Post::new(42, String::from("20161026120000"), msg);

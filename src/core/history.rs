@@ -2,7 +2,7 @@
  * The history container and listener.
  */
 
-use post::{Post, UserPost};
+use core::{Post, UserPost};
 use iron::typemap::Key;
 use time::{now, strftime};
 use std::result::Result;
@@ -41,7 +41,7 @@ impl History {
 	 * Basic usage:
 	 *
 	 * ```
-	 * use oxyboard::history::History;
+	 * use oxyboard::core::History;
 	 *
 	 * let board_name = String::from("Oxyboard");
 	 * let hist = History::new(&board_name, 512);
@@ -128,8 +128,7 @@ impl History {
 	 * Basic usage:
 	 *
 	 * ```
-	 * use oxyboard::post::UserPost;
-	 * use oxyboard::history::History;
+	 * use oxyboard::core::{History, UserPost};
 	 *
 	 * // Create a history and post message
 	 * let board_name = String::from("Oxyboard");

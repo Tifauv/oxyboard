@@ -2,12 +2,11 @@
  * The handlers for post requests.
  */
 
-use history::History;
+use core::{History, UserPost};
 use iron::headers::UserAgent;
 use iron::prelude::*;
 use iron::status;
 use persistent::State;
-use post::UserPost;
 use std::io::Read;
 use std::result::Result;
 
