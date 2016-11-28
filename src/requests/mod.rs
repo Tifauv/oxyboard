@@ -2,5 +2,6 @@
  * The handlers for the board's accepted requests.
  */
 
-pub mod post;
 pub mod backend;
+pub mod board;
+pub mod post;

@@ -45,6 +45,7 @@
  */
 extern crate csv;
 extern crate iron;
+extern crate mustache;
 extern crate persistent;
 extern crate rustc_serialize;
 extern crate time;

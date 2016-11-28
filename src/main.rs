@@ -10,7 +10,7 @@ use iron::prelude::*;
 use oxyboard::config;
 use oxyboard::config::{Config, ConfigLoader, TomlConfigLoader};
 use oxyboard::core::{History, HistoryRecorder};
-use oxyboard::requests::{backend, post};
+use oxyboard::requests::{backend, board, post};
 use oxyboard::storage::{StorageBackend, CsvFileStorage};
 use persistent::State;
 use router::Router;
@@ -62,6 +62,7 @@ fn main() {
 	// Create the request router
 	let mut router = Router::new();
 	router.get("/backend", backend::backend_handler, "backend_xml");
+	router.get("/board",   board::board_handler,     "board_html");
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history storage engine
