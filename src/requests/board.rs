@@ -34,6 +34,9 @@ pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
 		<script src=\"https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js\"></script>
 		<script src=\"https://oss.maxcdn.com/respond/1.4.2/respond.min.js\"></script>
 		<![endif]-->
+		<style>
+		#content { margin-top: 71px }
+		</style>
     </head>
     <body>
 		<nav class=\"navbar navbar-inverse navbar-fixed-top\">
@@ -57,7 +60,21 @@ pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
 			</div>
 		</nav>
 
-		<div class=\"container\">
+		<div id=\"content\" class=\"container\">
+			<div id=\"board\" class=\"col-sm-12\">
+			</div>
+			<div id=\"post\" class=\"col-sm-12\">
+				<form name=\"post-form\" class=\"form-inline\" method=\"post\" action=\"/post\">
+					<div class=\"form-group\">
+						<label class=\"sr-only\" for=\"message\">Message</label>
+						<div class=\"input-group\">
+							<div class=\"input-group-addon\">Anonyme</div>
+							<input type=\"text\" class=\"form-control\" id=\"message\" name=\"message\" placeholder=\"Entrez votre message ici\">
+						</div>
+						<button type=\"submit\" class=\"btn btn-primary\">Envoyer</button>
+					</div>
+				</form>
+			</div>
 		</div>
     </body>
     </html>").unwrap();
