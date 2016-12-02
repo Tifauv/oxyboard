@@ -9,6 +9,14 @@ use std::result::Result;
 use std::collections::vec_deque::{VecDeque, Iter};
 
 
+#[derive(RustcEncodable)]
+pub struct HistoryData {
+	pub board_name   : String,
+	pub posts        : VecDeque<Post>,
+	pub max_size     : usize,
+}
+
+
 /**
  * A `History` contains the current messages of a board.
  *
@@ -25,9 +33,7 @@ use std::collections::vec_deque::{VecDeque, Iter};
  * external routines.
  */
 pub struct History {
-	board_name   : String,
-	posts        : VecDeque<Post>,
-	max_size     : usize,
+	data : HistoryData,
 	next_post_id : u64,
 	events       : HistoryEventDispatcher
 }
@@ -51,11 +57,13 @@ impl History {
 	 */
 	pub fn new(p_name: &String, p_max_size: usize) -> History {
 		History {
-			board_name   : p_name.clone(),
-			posts        : VecDeque::new(),
-			max_size     : p_max_size,
+			data : HistoryData {
+				board_name : p_name.clone(),
+				posts      : VecDeque::new(),
+				max_size   : p_max_size,
+			},
 			next_post_id : 1,
-			events       : HistoryEventDispatcher::new()
+			events : HistoryEventDispatcher::new()
 		}
 	}
 
@@ -66,7 +74,7 @@ impl History {
 	 * This name is the one given to `History::new()`.
 	 */
 	pub fn board_name(&self) -> &String {
-		&self.board_name
+		&self.data.board_name
 	}
 
 
@@ -76,7 +84,7 @@ impl History {
 	 * This size should not be greater than `self.max_size`.
 	 */
 	pub fn size(&self) -> usize {
-		self.posts.len()
+		self.data.posts.len()
 	}
 
 
@@ -94,14 +102,14 @@ impl History {
 	 */
 	pub fn add_full_post(&mut self, p_post: Post) {
 		// Remove the oldest post if the history will exceed its maximum size
-		if self.posts.len() >= self.max_size {
-			self.events.post_removed(&self.posts.pop_front().unwrap());
+		if self.data.posts.len() >= self.data.max_size {
+			self.events.post_removed(&self.data.posts.pop_front().unwrap());
 		}
 
 		// Add the new post
 		let post_id = p_post.id();
-		self.posts.push_back(p_post);
-		self.events.post_added(&self.posts.back().unwrap());
+		self.data.posts.push_back(p_post);
+		self.events.post_added(&self.data.posts.back().unwrap());
 
 		// Increment the post id counter
 		self.next_post_id = post_id + 1;
@@ -152,14 +160,14 @@ impl History {
 		let post = Post::new(self.next_post_id, datetime, p_user_post);
 
 		// Remove the oldest post if the history will exceed its maximum size
-		if self.posts.len() >= self.max_size {
-			self.events.post_removed(&self.posts.pop_front().unwrap());
+		if self.data.posts.len() >= self.data.max_size {
+			self.events.post_removed(&self.data.posts.pop_front().unwrap());
 		}
 
 		// Add the new post
 		let post_id = post.id();
-		self.posts.push_back(post);
-		self.events.post_added(&self.posts.back().unwrap());
+		self.data.posts.push_back(post);
+		self.events.post_added(&self.data.posts.back().unwrap());
 
 		// Increment the post id counter
 		self.next_post_id += 1;
@@ -171,7 +179,7 @@ impl History {
 	 * Returns an immutable iterator on the posts.
 	 */
 	pub fn iter(&self) -> Iter<Post> {
-		self.posts.iter()
+		self.data.posts.iter()
 	}
 
 

@@ -2,14 +2,78 @@
  * The handlers for the board ui.
  */
 
-use core::History;
+use core::{History, Post};
 use std::io::Cursor;
 use iron::headers::ContentType;
 use iron::prelude::*;
 use iron::status;
 use mustache;
-use mustache::MapBuilder;
 use persistent::State;
+
+
+#[derive(RustcEncodable)]
+struct PostViewModel<'a> {
+	login      : &'a str,
+	user_agent : String,
+	clock      : String,
+	date       : String,
+	message    : &'a str,
+}
+
+
+impl<'a> PostViewModel<'a> {
+	fn new(p_post: &Post) -> PostViewModel {
+		PostViewModel {
+			login      : p_post.login(),
+			user_agent : PostViewModel::truncate_user_agent(p_post.user_agent()),
+			clock      : PostViewModel::extract_clock(p_post.time()),
+			date       : PostViewModel::extract_date(p_post.time()),
+			message    : p_post.message(),
+		}
+	}
+
+
+	fn truncate_user_agent(p_user_agent: &str) -> String {
+		if p_user_agent.len() > 16 {
+			p_user_agent[.. 16].to_owned()
+		}
+		else {
+			p_user_agent.to_owned()
+		}
+	}
+
+
+	fn extract_clock(p_time: &str) -> String {
+		let hours  : &str = &p_time[ 8 .. 10];
+		let minutes: &str = &p_time[10 .. 12];
+		let seconds: &str = &p_time[12 .. 14];
+		format!("{}:{}:{}", hours, minutes, seconds)
+	}
+
+
+	fn extract_date(p_time: &str) -> String {
+		let year : &str = &p_time[0 .. 4];
+		let month: &str = &p_time[4 .. 6];
+		let day  : &str = &p_time[6 .. 8];
+		format!("{}/{}/{}", day, month, year)
+	}
+}
+
+#[derive(RustcEncodable)]
+struct BoardViewModel<'a> {
+	board_name : &'a str,
+	posts      : Vec<PostViewModel<'a>>,
+}
+
+
+impl<'a> BoardViewModel<'a> {
+	fn new(p_history: &History) -> BoardViewModel {
+		BoardViewModel {
+			board_name : p_history.board_name(),
+			posts      : p_history.iter().map(|ref p| PostViewModel::new(&p)).collect::<Vec<_>>(),
+		}
+	}
+}
 
 
 /**
@@ -52,18 +116,33 @@ pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
 				</div>
 				<div id=\"navbar\" class=\"collapse navbar-collapse\">
 					<ul class=\"nav navbar-nav\">
-						<li class=\"active\"><a href=\"#\">Home</a></li>
-						<li><a href=\"#about\">About</a></li>
-						<li><a href=\"#contact\">Contact</a></li>
+						<li class=\"active\"><a href=\"#\">Tribune</a></li>
+						<li><a href=\"#config\">Config</a></li>
+						<li><a href=\"#\">Login</a></li>
 					</ul>
 				</div><!--/.nav-collapse -->
 			</div>
 		</nav>
 
 		<div id=\"content\" class=\"container\">
-			<div id=\"board\" class=\"col-sm-12\">
+			<div id=\"board\" class=\"col-sm-10 panel panel-default\">
+				<div class=\"panel-body\">
+					{{#posts}}
+					<div class=\"row\">
+						<div class=\"col-md-2 text-right\">
+							<span class=\"post-author\">{{user_agent}}</span>
+						</div>
+						<div class=\"col-md-1\" title=\"{{date}}\">
+							<span class=\"post-time\">{{clock}}</span>
+						</div>
+						<div class=\"col-md-9 text-justify\">
+							<span class=\"post-message\">{{message}}</span>
+						</div>
+					</div>
+					{{/posts}}
+				</div>
 			</div>
-			<div id=\"post\" class=\"col-sm-12\">
+			<div id=\"post\" class=\"col-sm-10\">
 				<form name=\"post-form\" class=\"form-inline\" method=\"post\" action=\"/post\">
 					<div class=\"form-group\">
 						<label class=\"sr-only\" for=\"message\">Message</label>
@@ -79,12 +158,8 @@ pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
     </body>
     </html>").unwrap();
 
-    // Build the template data
-    let data = MapBuilder::new()
-        .insert_str("board_name", &history.board_name())
-        .build();
-
 	let mut buffer = Cursor::new(Vec::new());
-    template.render_data(&mut buffer, &data).unwrap();
+	let data = BoardViewModel::new(&history);
+    template.render(&mut buffer, &data).unwrap();
 	Ok( Response::with(( ContentType::html().0, status::Ok, String::from_utf8(buffer.into_inner()).unwrap() )))
 }
