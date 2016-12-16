@@ -5,13 +5,15 @@ extern crate oxyboard;
 extern crate persistent;
 extern crate router;
 
-use clap::{Arg, App};
+use clap::{ Arg, App };
 use iron::prelude::*;
+use iron::AroundMiddleware;
 use oxyboard::config;
-use oxyboard::config::{Config, ConfigLoader, TomlConfigLoader};
-use oxyboard::core::{History, HistoryRecorder};
-use oxyboard::requests::{backend, board, post};
-use oxyboard::storage::{StorageBackend, CsvFileStorage};
+use oxyboard::config::{ Config, ConfigLoader, TomlConfigLoader };
+use oxyboard::core::{ History, HistoryRecorder };
+use oxyboard::requests::{ backend, board, post };
+use oxyboard::requests::template_engine::TemplateEngine;
+use oxyboard::storage::{ StorageBackend, CsvFileStorage };
 use persistent::State;
 use router::Router;
 use std::io;
@@ -59,10 +61,13 @@ fn main() {
 	let config_file = matches.value_of("config").unwrap_or("config/oxyboard.toml");
 	let config = load_config(&config_file);
 
+	// Create the template engine
+	let template_engine = TemplateEngine::new("templates").ok().expect("Failed to load the template files !");
+
 	// Create the request router
 	let mut router = Router::new();
 	router.get("/backend", backend::backend_handler, "backend_xml");
-	router.get("/board",   board::board_handler,     "board_html");
+	router.get("/board",   template_engine.around(Box::new(board::board_handler)),              "board_html");
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history storage engine
@@ -83,7 +88,7 @@ fn main() {
 	let history_recorder = HistoryRecorder::new(history_storage);
 	history.add_listener(Box::new(history_recorder));
 
-	// Store the history in the shared state
+	// Store the history in the shared state and add the template middleware
 	let mut chain = Chain::new(router);
 	chain.link(State::<History>::both(history));
 
