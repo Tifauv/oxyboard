@@ -27,10 +27,10 @@ impl TomlConfigLoader {
 	 * Reads the content of the configuration file.
 	 */
 	fn read_file(&self) -> io::Result<String> {
-		let file = try!(File::open(&self.file));
+		let file = File::open(&self.file)?;
 		let mut reader = BufReader::new(file);
 		let mut data = String::new();
-		try!(reader.read_to_string(&mut data));
+		reader.read_to_string(&mut data)?;
 		Ok(data)
 	}
 }
@@ -41,7 +41,7 @@ impl ConfigLoader for TomlConfigLoader {
 	 * Reads the configuration file and parses its content.
 	 */
 	fn load(&self) -> io::Result<Config> {
-		let file_content = try!(self.read_file());
+		let file_content = self.read_file()?;
 
 		let mut parser = Parser::new(&file_content);
 		match parser.parse() {

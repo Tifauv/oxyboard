@@ -68,12 +68,12 @@ impl StorageBackend for CsvFileStorage {
 	 * It is created if needed, as is its directory path.
 	 */
 	fn save_post(&self, p_post: &Post) -> io::Result<&Self> {
-		try!(fs::create_dir_all(&self.dir));
+		fs::create_dir_all(&self.dir)?;
 		let mut writer = csv::Writer::from_writer(
-				try!(OpenOptions::new()
+				OpenOptions::new()
 					.create(true)
 					.append(true)
-					.open(&self.file_path())));
+					.open(&self.file_path())? );
 
 		writer.encode(p_post).and(Ok(self)).map_err(|e| {
 			match e {
@@ -94,7 +94,7 @@ impl StorageBackend for CsvFileStorage {
 	 *
 	 */
 	fn load_history(&self, p_history: &mut History) -> io::Result<usize> {
-		let mut reader = csv::Reader::from_reader(try!(fs::File::open(&self.file_path())))
+		let mut reader = csv::Reader::from_reader(fs::File::open(&self.file_path())? )
 				.has_headers(false);
 
 		let mut count = 0;
