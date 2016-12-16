@@ -71,12 +71,12 @@ impl<H: Handler> Handler for TemplateHandler<H> {
 			return Ok(response);
 		}
         let name = response.extensions.get::<TemplateName>().unwrap();
-		let data = response.extensions.get::<TemplateData>().unwrap();
+		let data = response.extensions.get::<TemplateData>();
 
-        match self.template.render_view(name, data) {
+		match self.template.render_data(name, data.unwrap()) {
 			Some(view) => Ok(Self::html_response(view)),
 			None => Err(IronError::new(HttpError::Io(Error::new(ErrorKind::NotFound, "Template not found")), status::InternalServerError))
-        }
+		}
     }
 }
 
@@ -119,7 +119,7 @@ impl TemplateEngine {
         })
     }
 
-    fn render_view(&self, p_name: &str, p_data: &Data) -> Option<Cursor<Vec<u8>>> {
+    fn render_data(&self, p_name: &str, p_data: &Data) -> Option<Cursor<Vec<u8>>> {
 		let mut buffer = Cursor::new(Vec::new());
 		self.templates.get(p_name).map(|t| { t.render_data(&mut buffer, p_data).unwrap(); buffer } )
     }
@@ -137,14 +137,13 @@ impl AroundMiddleware for TemplateEngine {
     }
 }
 
-pub fn view_response(p_template_name: String, p_data: Data) -> Response {
+pub fn build_html_response(p_template_name: &str, p_data: Data) -> Response {
     let mut response = Response::with((
 		ContentType::html().0,
 		status::Ok,
 	));
 
-	response.extensions.insert::<TemplateName>(p_template_name);
+	response.extensions.insert::<TemplateName>(p_template_name.to_string());
 	response.extensions.insert::<TemplateData>(p_data);
 	response
 }
-

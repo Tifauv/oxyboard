@@ -67,7 +67,7 @@ fn main() {
 	// Create the request router
 	let mut router = Router::new();
 	router.get("/backend", backend::backend_handler, "backend_xml");
-	router.get("/board",   template_engine.around(Box::new(board::board_handler)),              "board_html");
+	router.get("/board",   template_engine.around(Box::new(board::board_handler)), "board_html");
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history storage engine

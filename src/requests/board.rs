@@ -3,12 +3,10 @@
  */
 
 use core::{History, Post};
-use std::io::Cursor;
-use iron::headers::ContentType;
 use iron::prelude::*;
-use iron::status;
-use mustache;
+use mustache::MapBuilder;
 use persistent::State;
+use requests::template_engine::build_html_response;
 
 
 #[derive(RustcEncodable)]
@@ -59,22 +57,6 @@ impl<'a> PostViewModel<'a> {
 	}
 }
 
-#[derive(RustcEncodable)]
-struct BoardViewModel<'a> {
-	board_name : &'a str,
-	posts      : Vec<PostViewModel<'a>>,
-}
-
-
-impl<'a> BoardViewModel<'a> {
-	fn new(p_history: &History) -> BoardViewModel {
-		BoardViewModel {
-			board_name : p_history.board_name(),
-			posts      : p_history.iter().map(|ref p| PostViewModel::new(&p)).collect::<Vec<_>>(),
-		}
-	}
-}
-
 
 /**
  * Handler for GET board requests.
@@ -86,18 +68,15 @@ pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
 	let lock = p_request.get::<State<History>>().unwrap();
 	let history = lock.read().unwrap();
 
-	// Compile the page template
-	// TODO: share and reuse the compiled template
-	let template = match mustache::compile_path("templates/board.mustache.html") {
-		Ok(x) => x,
-		Err(e) => return Ok( Response::with(( status::InternalServerError, format!("Template for page /board not found or not readable: {}", e) )))
-	};
+	let data = MapBuilder::new()
+		.insert_str("board_name", history.board_name())
+		.insert_vec("posts",      |mut builder| {
+				for post in history.iter().map(|ref p| PostViewModel::new(&p)).collect::<Vec<_>>() {
+					builder = builder.push(&post).unwrap();
+				}
+				builder
+			})
+		.build();
 
-	// Instantiate the page template
-	let mut buffer = Cursor::new(Vec::new());
-	let data = BoardViewModel::new(&history);
-    template.render(&mut buffer, &data).unwrap();
-
-    // Return the page
-	Ok( Response::with(( ContentType::html().0, status::Ok, String::from_utf8(buffer.into_inner()).unwrap() )))
+	Ok(build_html_response("board.html", data))
 }
