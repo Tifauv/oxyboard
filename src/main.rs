@@ -66,6 +66,7 @@ fn main() {
 
 	// Create the request router
 	let mut router = Router::new();
+	//router.get("/about",   template_engine.around(Box::new(about::about_handler)), "about_html");
 	router.get("/board",   template_engine.around(Box::new(board::board_handler)), "board_html");
 	router.get("/backend", backend::backend_handler, "backend_xml");
 	router.post("/post",   post::post_handler,       "post_message");
