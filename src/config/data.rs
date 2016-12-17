@@ -4,7 +4,7 @@
  * # Examples
  *
  * ```
- * use oxyboard::config::{Config,ServerParams,BoardParams,StorageParams};
+ * use oxyboard::config::{ Config, ServerParams, BoardParams, StorageParams, UiParams };
  *
  * let cfg = Config {
  *         server: ServerParams {
@@ -19,12 +19,16 @@
  *         storage: StorageParams {
  *             data_dir : String::from("data"),
  *         },
+ *         ui: UiParams {
+ *             templates_dir : String::from("templates"),
+ *         },
  * };
  * assert_eq!(cfg.server.ip,          String::from("localhost"));
  * assert_eq!(cfg.server.port,        8080);
  * assert_eq!(cfg.board.name,         String::from("oxyboard"));
  * assert_eq!(cfg.board.history_size, 512);
  * assert_eq!(cfg.storage.data_dir,   String::from("data"));
+ * assert_eq!(cfg.ui.templates_dir,   String::from("tempaltes"));
  * ```
  */
 #[derive(Debug,RustcDecodable)]
@@ -32,6 +36,7 @@ pub struct Config {
 	pub server  : ServerParams,
 	pub board   : BoardParams,
 	pub storage : StorageParams,
+	pub ui      : UiParams,
 }
 
 
@@ -98,4 +103,24 @@ pub struct BoardParams {
 #[derive(Debug,RustcDecodable)]
 pub struct StorageParams {
 	pub data_dir : String,
+}
+
+
+/**
+ * The ui parameters define the directory of the tempaltes.
+ *
+ * # Examples
+ *
+ * ```
+ * use oxyboard::config::UiParams;
+ *
+ * let ui_cfg = UiParams {
+ *         templates_dir : String::from("templates"),
+ * };
+ * assert_eq!(ui_cfg.templates_dir, String::from("templates"));
+ * ```
+ */
+#[derive(Debug,RustcDecodable)]
+pub struct UiParams {
+	pub templates_dir : String,
 }

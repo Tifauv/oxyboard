@@ -62,12 +62,12 @@ fn main() {
 	let config = load_config(&config_file);
 
 	// Create the template engine
-	let template_engine = TemplateEngine::new("templates").ok().expect("Failed to load the template files !");
+	let template_engine = TemplateEngine::new(&config.ui.templates_dir).ok().expect("Failed to load the template files !");
 
 	// Create the request router
 	let mut router = Router::new();
-	router.get("/backend", backend::backend_handler, "backend_xml");
 	router.get("/board",   template_engine.around(Box::new(board::board_handler)), "board_html");
+	router.get("/backend", backend::backend_handler, "backend_xml");
 	router.post("/post",   post::post_handler,       "post_message");
 
 	// Create the history storage engine

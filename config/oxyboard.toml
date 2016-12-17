@@ -9,3 +9,5 @@ history_size = 1024
 [storage]
 data_dir = "data"
 
+[ui]
+templates_dir = "templates"
