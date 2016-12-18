@@ -28,7 +28,7 @@
  * assert_eq!(cfg.board.name,         String::from("oxyboard"));
  * assert_eq!(cfg.board.history_size, 512);
  * assert_eq!(cfg.storage.data_dir,   String::from("data"));
- * assert_eq!(cfg.ui.templates_dir,   String::from("tempaltes"));
+ * assert_eq!(cfg.ui.templates_dir,   String::from("templates"));
  * ```
  */
 #[derive(Debug,RustcDecodable)]

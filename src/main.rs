@@ -1,5 +1,6 @@
 extern crate clap;
 extern crate iron;
+extern crate mount;
 #[macro_use]
 extern crate oxyboard;
 extern crate persistent;
@@ -8,10 +9,11 @@ extern crate router;
 use clap::{ Arg, App };
 use iron::prelude::*;
 use iron::AroundMiddleware;
+use mount::Mount;
 use oxyboard::config;
 use oxyboard::config::{ Config, ConfigLoader, TomlConfigLoader };
 use oxyboard::core::{ History, HistoryRecorder };
-use oxyboard::requests::{ backend, board, post };
+use oxyboard::requests::{ about, backend, board, post };
 use oxyboard::requests::template_engine::TemplateEngine;
 use oxyboard::storage::{ StorageBackend, CsvFileStorage };
 use persistent::State;
@@ -42,6 +44,42 @@ fn load_config(p_file: &str) -> Config {
 
 
 /**
+ * Creates a router for the website requests of the application.
+ */
+fn site_router() -> Router {
+	let mut router = Router::new();
+	router.get("/about",   about::about_handler, "about_html");
+	router.get("/board",   board::board_handler, "board_html");
+	router.post("/post",   post::post_handler,   "post_message");
+	router
+}
+
+
+/**
+ * Creates a router for the API requests of the application.
+ */
+fn api_router() -> Router {
+	let mut router = Router::new();
+	router.get("/backend", backend::backend_handler, "backend_xml");
+	router
+}
+
+
+/**
+ *
+ */
+fn mount(p_config: &Config) -> Mount {
+	// Create the template engine
+	let template_engine = TemplateEngine::new(&p_config.ui.templates_dir).ok().expect("Failed to load the template files !");
+
+	let mut mount = Mount::new();
+	mount.mount("/",    template_engine.around(Box::new(site_router())));
+	mount.mount("/api", api_router());
+	mount
+}
+
+
+/**
  * Main function that sets the Iron server up and starts it.
  */
 fn main() {
@@ -61,18 +99,8 @@ fn main() {
 	let config_file = matches.value_of("config").unwrap_or("config/oxyboard.toml");
 	let config = load_config(&config_file);
 
-	// Create the template engine
-	let template_engine = TemplateEngine::new(&config.ui.templates_dir).ok().expect("Failed to load the template files !");
-
-	// Create the request router
-	let mut router = Router::new();
-	//router.get("/about",   template_engine.around(Box::new(about::about_handler)), "about_html");
-	router.get("/board",   template_engine.around(Box::new(board::board_handler)), "board_html");
-	router.get("/backend", backend::backend_handler, "backend_xml");
-	router.post("/post",   post::post_handler,       "post_message");
-
 	// Create the history storage engine
-	let history_storage = CsvFileStorage::new(config.storage.data_dir, String::from("history.csv"));
+	let history_storage = CsvFileStorage::new(&config.storage.data_dir, String::from("history.csv"));
 
 	// Create the history
 	let mut history = History::new(&config.board.name, config.board.history_size);
@@ -90,7 +118,7 @@ fn main() {
 	history.add_listener(Box::new(history_recorder));
 
 	// Store the history in the shared state and add the template middleware
-	let mut chain = Chain::new(router);
+	let mut chain = Chain::new(mount(&config));
 	chain.link(State::<History>::both(history));
 
 	// Start the server

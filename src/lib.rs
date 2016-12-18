@@ -34,7 +34,7 @@
  * // Load a CSV file
  * let data_dir = String::from("data");
  * let history_file = String::from("history.csv");
- * let storage = CsvFileStorage::new(data_dir, history_file);
+ * let storage = CsvFileStorage::new(&data_dir, history_file);
  * storage.load_history(&mut history);
  * ```
  *

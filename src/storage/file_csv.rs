@@ -21,7 +21,7 @@ use std::io::ErrorKind;
  * For example, the following post
  *
  * ```
- * use oxyboard::core::{Post, UserPost};
+ * use oxyboard::core::{ Post, UserPost };
  *
  * let request = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
  * let post = Post::new(42, String::from("20161026120000"), request);
@@ -42,9 +42,9 @@ impl CsvFileStorage {
 	 *
 	 * It needs two informations, the name of the CSV file and its location (directory).
 	 */
-	pub fn new(p_dir: String, p_file: String) -> CsvFileStorage {
+	pub fn new(p_dir: &String, p_file: String) -> CsvFileStorage {
 		CsvFileStorage {
-			dir : p_dir,
+			dir : p_dir.clone(),
 			file : p_file,
 		}
 	}
