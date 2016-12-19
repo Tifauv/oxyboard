@@ -13,7 +13,7 @@ use mount::Mount;
 use oxyboard::config;
 use oxyboard::config::{ Config, ConfigLoader, TomlConfigLoader };
 use oxyboard::core::{ History, HistoryRecorder };
-use oxyboard::requests::{ about, backend, board, post };
+use oxyboard::requests::{ about, backend, board, default, post };
 use oxyboard::requests::template_engine::TemplateEngine;
 use oxyboard::storage::{ StorageBackend, CsvFileStorage };
 use persistent::State;
@@ -46,21 +46,13 @@ fn load_config(p_file: &str) -> Config {
 /**
  * Creates a router for the website requests of the application.
  */
-fn site_router() -> Router {
+fn router() -> Router {
 	let mut router = Router::new();
-	router.get("/about",   about::about_handler, "about_html");
-	router.get("/board",   board::board_handler, "board_html");
-	router.post("/post",   post::post_handler,   "post_message");
-	router
-}
-
-
-/**
- * Creates a router for the API requests of the application.
- */
-fn api_router() -> Router {
-	let mut router = Router::new();
-	router.get("/backend", backend::backend_handler, "backend_xml");
+	router.get("/",        default::default_handler, "default");
+	router.get("/about",   about::about_handler,     "about");
+	router.get("/board",   board::board_handler,     "board");
+	router.post("/post",   post::post_handler,       "post_message");
+	router.get("/backend", backend::backend_handler, "get_backend");
 	router
 }
 
@@ -73,8 +65,7 @@ fn mount(p_config: &Config) -> Mount {
 	let template_engine = TemplateEngine::new(&p_config.ui.templates_dir).ok().expect("Failed to load the template files !");
 
 	let mut mount = Mount::new();
-	mount.mount("/",    template_engine.around(Box::new(site_router())));
-	mount.mount("/api", api_router());
+	mount.mount("/", template_engine.around(Box::new(router())));
 	mount
 }
 
@@ -117,7 +108,7 @@ fn main() {
 	let history_recorder = HistoryRecorder::new(history_storage);
 	history.add_listener(Box::new(history_recorder));
 
-	// Store the history in the shared state and add the template middleware
+	// Store the history in a shared state and add it to the handlers chain
 	let mut chain = Chain::new(mount(&config));
 	chain.link(State::<History>::both(history));
 

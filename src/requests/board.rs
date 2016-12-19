@@ -2,17 +2,18 @@
  * The handlers for the board ui.
  */
 
-use core::{History, Post};
+use core::{ History, Post };
 use iron::prelude::*;
 use mustache::MapBuilder;
 use persistent::State;
-use requests::template_engine::build_html_response;
+use requests::template_engine::build_response;
 
 
 #[derive(RustcEncodable)]
 struct PostViewModel<'a> {
 	login      : &'a str,
-	user_agent : String,
+	info       : String,
+	user_agent : &'a str,
 	clock      : String,
 	date       : String,
 	message    : &'a str,
@@ -23,7 +24,8 @@ impl<'a> PostViewModel<'a> {
 	fn new(p_post: &Post) -> PostViewModel {
 		PostViewModel {
 			login      : p_post.login(),
-			user_agent : PostViewModel::truncate_user_agent(p_post.user_agent()),
+			info       : PostViewModel::truncate_user_agent(p_post.user_agent()),
+			user_agent : p_post.user_agent(),
 			clock      : PostViewModel::extract_clock(p_post.time()),
 			date       : PostViewModel::extract_date(p_post.time()),
 			message    : p_post.message(),
@@ -78,5 +80,5 @@ pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
 			})
 		.build();
 
-	Ok(build_html_response("board.html", data))
+	Ok(build_response("board.html", data))
 }

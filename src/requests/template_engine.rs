@@ -10,6 +10,7 @@ use std::path::Path;
 use iron::{ AroundMiddleware, Handler, IronError, IronResult, Request, Response };
 use iron::error::HttpError;
 use iron::headers::ContentType;
+use iron::mime::Mime;
 use iron::status;
 use iron::typemap::Key;
 
@@ -40,6 +41,17 @@ impl Key for TemplateData {
 
 
 /**
+ * Type used to tag the template type in the `Response` extensions.
+ *
+ * Tht type of the associated value is `iron::mime::Mime`.
+ */
+struct TemplateType;
+impl Key for TemplateType {
+	type Value = Mime;
+}
+
+
+/**
  * The wrapping `Handler` associated with a request.
  *
  * It implements a method to create a response from an instanciated template page.
@@ -50,12 +62,19 @@ pub struct TemplateHandler<H: Handler> {
 }
 
 impl<H: Handler> TemplateHandler<H> {
-	fn html_response(p_page_data: Cursor<Vec<u8>>) -> Response {
-    	Response::with((
-			ContentType::html().0,
-			status::Ok,
-			String::from_utf8(p_page_data.into_inner()).unwrap()
-		))
+	fn response(p_content: Cursor<Vec<u8>>, p_type: Option<&Mime>) -> Response {
+		match p_type {
+			Some(content_type) => Response::with((
+					content_type.clone(),
+					status::Ok,
+					String::from_utf8(p_content.into_inner()).unwrap()
+				)),
+
+			None => Response::with((
+					status::Ok,
+					String::from_utf8(p_content.into_inner()).unwrap()
+				)),
+		}
 	}
 }
 
@@ -71,10 +90,11 @@ impl<H: Handler> Handler for TemplateHandler<H> {
 			return Ok(response);
 		}
         let name = response.extensions.get::<TemplateName>().unwrap();
-		let data = response.extensions.get::<TemplateData>();
+		let data = response.extensions.get::<TemplateData>().unwrap();
+		let content_type = response.extensions.get::<TemplateType>();
 
-		match self.template.render_data(name, data.unwrap()) {
-			Some(view) => Ok(Self::html_response(view)),
+		match self.template.render_data(name, data) {
+			Some(content) => Ok(Self::response(content, content_type)),
 			None => Err(IronError::new(HttpError::Io(Error::new(ErrorKind::NotFound, "Template not found")), status::InternalServerError))
 		}
     }
@@ -137,12 +157,14 @@ impl AroundMiddleware for TemplateEngine {
     }
 }
 
-pub fn build_html_response(p_template_name: &str, p_data: Data) -> Response {
+pub fn build_response(p_template_name: &str, p_data: Data) -> Response {
     let mut response = Response::with((
-		ContentType::html().0,
 		status::Ok,
 	));
 
+	if p_template_name.ends_with(".html") {
+		response.extensions.insert::<TemplateType>(ContentType::html().0);
+	}
 	response.extensions.insert::<TemplateName>(p_template_name.to_string());
 	response.extensions.insert::<TemplateData>(p_data);
 	response
