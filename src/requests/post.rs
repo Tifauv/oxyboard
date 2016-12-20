@@ -7,8 +7,8 @@ use iron::headers::UserAgent;
 use iron::prelude::*;
 use iron::status;
 use persistent::State;
-use std::io::Read;
 use std::result::Result;
+use urlencoded::{ UrlDecodingError, UrlEncodedBody };
 
 
 /**
@@ -23,29 +23,22 @@ fn make_user_post<'a>(p_request:&mut Request) -> Result<UserPost, &'a str> {
 	user_agent.truncate(80);
 
 	// Extract the message
-	let mut body = String::new();
-	p_request.body.read_to_string(&mut body).unwrap();
-	match extract_message(&body) {
-		Some(msg) => Ok(UserPost {
-						login     : String::new(),
-						user_agent: user_agent,
-						message   : msg.trim().to_string()
-					}),
-		None      => Err("No message in the request")
+	match url_decode(p_request) {
+		Ok(msg) => 	Ok(UserPost {
+				login     : String::new(),
+				user_agent: user_agent,
+				message   : msg.trim().to_string()
+			}),
+		Err(..) => Err("No message in the request")
 	}
 }
 
 
-/**
- * Extracts the message from the x-form-encoded request body.
- *
- * Looks for "message=" in the request body and returns anything after it.
- */
-fn extract_message(p_req_body:&String) -> Option<&str> {
-	let msg_start = "message=";
-	match p_req_body.rfind(&msg_start) {
-		Some(s) => Some(&p_req_body[(s+msg_start.len())..]),
-		None    => None
+fn url_decode(p_request: &mut Request) -> Result<String, UrlDecodingError> {
+	let hashmap = p_request.get_ref::<UrlEncodedBody>()?;
+	match hashmap.get("message") {
+		Some(values) => Ok(values.get(0).unwrap().clone()),
+		None         => Err(UrlDecodingError::EmptyQuery)
 	}
 }
 
