@@ -72,6 +72,7 @@ pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
 
 	let data = MapBuilder::new()
 		.insert_str("board_name", history.board_name())
+		.insert_str("current_page_board", "class=\"active\"")
 		.insert_vec("posts",      |mut builder| {
 				for post in history.iter().map(|ref p| PostViewModel::new(&p)).collect::<Vec<_>>() {
 					builder = builder.push(&post).unwrap();
