@@ -15,7 +15,10 @@
 			background-color: #fdf6e3;
 			color: #657b83;
 		}
-		#board .row:hover {
+		#board .table > tbody > tr > td {
+			border-top: 0;
+		}
+		#board .table tr:hover {
 			background-color: #eee8d5;
 			color: #657b83;
 		}
@@ -23,10 +26,14 @@
 			background-color: transparent;
 			color: #d33682;
 			font-style: italic;
+			min-width: 22pt;
+			max-width: 22pt;
 		}
 		#board .post-time {
 			background-color: transparent;
 			color: #859900;
+			min-width: 12pt;
+			max-width: 12pt;
 		}
 		#board .post-message b {
 			background-color: transparent;

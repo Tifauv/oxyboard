@@ -2,23 +2,20 @@
 {{> navbar_inc.html}}
 
 	<div id="content" class="container">
-		<div id="board" class="col-sm-10 panel panel-default">
-			<div class="panel-body">
-				{{#posts}}
-				<div class="row">
-					<div class="col-md-2 text-right" title="{{user_agent}}">
-						<span class="post-author">{{info}}</span>
-					</div>
-					<div class="col-md-1" title="{{date}}">
-						<span class="post-time">{{clock}}</span>
-					</div>
-					<div class="col-md-9 text-justify">
-						<span class="post-message">{{{message}}}</span>
-					</div>
-				</div>
-				{{/posts}}
+		<div class="col-sm-10">
+			<div id="board" class="panel panel-default">
+				<table class="table table-condensed">
+					{{#posts}}
+					<tr>
+						<td class="post-author" title="{{user_agent}}">{{info}}</td>
+						<td class="post-time"   title="{{date}}">{{clock}}</td>
+						<td class="post-message text-justify">{{{message}}}</td>
+					</tr>
+					{{/posts}}
+				</table>
 			</div>
 		</div>
+
 		<div id="post" class="col-sm-10">
 			<form name="post-form" class="form-inline" method="post" action="/post">
 				<div class="form-group">
