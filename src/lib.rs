@@ -44,6 +44,7 @@
  *
  */
 extern crate csv;
+extern crate hyper;
 extern crate iron;
 extern crate mustache;
 extern crate persistent;

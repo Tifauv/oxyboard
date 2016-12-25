@@ -4,17 +4,21 @@ version = "0.1.0"
 authors = [ "Olivier Serve <tifauv@gmail.com>" ]
 
 [dependencies]
-clap            = "*"
-csv             = "*"
-iron            = "*"
-mount           = "*"
-mustache        = "*"
-persistent      = "*"
-router          = "*"
-rustc-serialize = "*"
-time            = "*"
-toml            = "*"
-urlencoded      = "*"
+clap            = "2.18.0"
+csv             = "0.14.7"
+iron            = "0.4.0"
+mount           = "0.2.1"
+mustache        = "0.8.0"
+persistent      = "0.2.0"
+router          = "0.4.0"
+rustc-serialize = "0.3.19"
+time            = "0.1.35"
+toml            = "0.2.1"
+urlencoded      = "0.4.1"
+
+[dependencies.hyper]
+version = "0.9"
+default-features = false
 
 [[bin]]
 name = "oxyboard"
