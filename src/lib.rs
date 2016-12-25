@@ -44,6 +44,7 @@
  *
  */
 extern crate csv;
+#[macro_use]
 extern crate hyper;
 extern crate iron;
 extern crate mustache;

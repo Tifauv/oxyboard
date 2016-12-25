@@ -15,15 +15,17 @@ use iron::headers::parsing::from_raw_str;
  *
  * # ABNF
  * ```plain
- * Content-Length = 1*DIGIT
+ * X-POST-Id = 1*DIGIT
  * ```
  *
  * # Example values
  * * `3495`
  *
  * # Example
- * ```
- * use hyper::header::{ Headers, XPostId };
+ * ```plain
+ * extern crate hyper;
+ * use hyper::header::Headers;
+ * use oxyboard::requests::headers::XPostId;
  *
  * let mut headers = Headers::new();
  * headers.set(XPostId(1024u64));
@@ -58,3 +60,29 @@ impl HeaderFormat for XPostId {
 		fmt::Display::fmt(&self.0, p_formatter)
 	}
 }
+
+
+/**
+ * `X-Post-Error` header, used by the application to return an error message
+ * that occured when processing a POST message request.
+ * The error message is unstructured plain text.
+ *
+ * # ABNF
+ * ```plain
+ * X-Post-Error = token
+ * ```
+ *
+ * # Example values
+ * * `Bad user command`
+ *
+ * # Example
+ * ```plain
+ * extern crate hyper;
+ * use hyper::header::Headers;
+ * use oxyboard::requests::headers::XPostError;
+ *
+ * let mut headers = Headers::new();
+ * headers.set(XPostError("Bad user command".to_owned()));
+ * ```
+ */
+ header! { (XPostError, "X-Post-Error") => [String] }

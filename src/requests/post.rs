@@ -8,7 +8,7 @@ use iron::modifiers::Header;
 use iron::prelude::*;
 use iron::status;
 use persistent::State;
-use requests::headers::XPostId;
+use requests::headers::{ XPostId, XPostError };
 use std::result::Result;
 use urlencoded::{ UrlDecodingError, UrlEncodedBody };
 
@@ -60,9 +60,9 @@ pub fn post_handler(p_request: &mut Request) -> IronResult<Response> {
 	// Store the message and return the post id
 	match make_user_post(p_request) {
 		Ok(user_post) => match history.add_post(user_post) {
-				Ok(post_id)  => Ok( Response::with(( status::Created, Header(XPostId(post_id)), "Created" )) ),
-				Err(err_msg) => Ok( Response::with(( status::InternalServerError, format!("X-Post-Error: {}", err_msg) )) )
+				Ok(post_id) => Ok( Response::with(( status::Created, Header(XPostId(post_id)), "Created" )) ),
+				Err(error)  => Ok( Response::with(( status::InternalServerError, Header(XPostError(error.to_owned())), format!("Error: {}", error) )) )
 		},
-		Err(err_msg) => Ok( Response::with(( status::BadRequest, format!("X-Post-Error: {}", err_msg) )) )
+		Err(error) => Ok( Response::with(( status::BadRequest, Header(XPostError(error.to_owned())), format!("Error: {}", error) )) )
 	}
 }
