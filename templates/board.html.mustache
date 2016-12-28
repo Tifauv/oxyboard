@@ -53,10 +53,7 @@
 		function messagePosted(p_response) {
 			console.log("--Success");
 			console.log("  response: " + p_response);
-			$("#feedback")
-				.attr("class", "alert alert-success alert-dismissible")
-				.attr("role" , "alert")
-				.html("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>Message ajouté");
+			showSuccessFeedback("Message ajouté");
 		}
 
 		function messageError(p_response, p_status, p_message) {
@@ -64,10 +61,30 @@
 			console.log("  response: " + p_response);
 			console.log("    status: " + p_status);
 			console.log("     error: " + p_message);
-			$("#feedback")
-				.attr("class", "alert alert-warning alert-dismissible")
-				.attr("role" , "alert")
-				.html("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>Erreur&nbsp;:</strong> " + p_message);
+			showWarningFeedback("<strong>Erreur&nbsp;:</strong> " + p_message);
+		}
+
+		function showSuccessFeedback(p_message) {
+			addAlert("success", p_message);
+			setTimeout(closeFeedback, 2000);
+		}
+
+		function showWarningFeedback(p_message) {
+			addAlert("warning", p_message);
+			setTimeout(closeFeedback, 8000);
+		}
+
+		function addAlert(p_type, p_message) {
+			$("<div/>", {
+				id     : "feedback-alert",
+				"class": "alert alert-dismissible alert-" + p_type,
+				role   : "alert",
+				html   : "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>" + p_message
+			}).appendTo("#feedback");
+		}
+
+		function closeFeedback() {
+			$("#feedback-alert").alert("close");
 		}
 
     	function displayBoard() {
