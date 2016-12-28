@@ -27,21 +27,48 @@
 					<button type="submit" class="btn btn-primary" id="send">Envoyer</button>
 				</div>
 			</form>
+			<div id="feedback"></div>
 		</div>
 	</div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script>
 	$(document).ready(function() {
     	displayBoard();
 
-		$('#post-form').submit(function() {
+		$("#post-form").submit(function() {
 			console.log("Submitting the form...");
-        	var message = $('#message').val();
-        	$.post('/post', { 'message': message }, displayBoard);
+			$.ajax({
+				url     : "/post",
+				data    : $('#post-form').serialize(),
+				type    : "POST",
+				dataType: "text"
+			}).done(messagePosted)
+			.fail(messageError);
 			console.log("POST request sent.");
 			return false;
     	});
+
+		function messagePosted(p_response) {
+			console.log("--Success");
+			console.log("  response: " + p_response);
+			$("#feedback")
+				.attr("class", "alert alert-success alert-dismissible")
+				.attr("role" , "alert")
+				.html("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>Message ajouté");
+		}
+
+		function messageError(p_response, p_status, p_message) {
+			console.log("--Error");
+			console.log("  response: " + p_response);
+			console.log("    status: " + p_status);
+			console.log("     error: " + p_message);
+			$("#feedback")
+				.attr("class", "alert alert-warning alert-dismissible")
+				.attr("role" , "alert")
+				.html("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>Erreur&nbsp;:</strong> " + p_message);
+		}
 
     	function displayBoard() {
 			console.log("Refreshing board...");
