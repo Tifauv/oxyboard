@@ -7,16 +7,20 @@ use std::io;
 use std::io::{ Cursor, Error, ErrorKind };
 use std::path::Path;
 
+use hyper::header::{ CacheControl, CacheDirective, Expires, HttpDate };
+
 use iron::{ AroundMiddleware, Handler, IronError, IronResult, Request, Response };
 use iron::error::HttpError;
 use iron::headers::ContentType;
 use iron::mime::Mime;
+use iron::modifiers::Header;
 use iron::status;
 use iron::typemap::Key;
 
 use mustache;
 use mustache::Data;
 
+use time;
 
 /**
  * Type used to tag the template name in the `Response` extensions.
@@ -63,15 +67,26 @@ pub struct TemplateHandler<H: Handler> {
 
 impl<H: Handler> TemplateHandler<H> {
 	fn response(p_content: Cursor<Vec<u8>>, p_type: Option<&Mime>) -> Response {
+		let no_cache = CacheControl(vec![
+        	CacheDirective::NoCache,
+        	CacheDirective::NoStore,
+			CacheDirective::MustRevalidate,
+    	]);
+		let expires = Expires(HttpDate(time::empty_tm()));
+
 		match p_type {
 			Some(content_type) => Response::with((
 					content_type.clone(),
 					status::Ok,
+					Header(no_cache),
+					Header(expires),
 					String::from_utf8(p_content.into_inner()).unwrap()
 				)),
 
 			None => Response::with((
 					status::Ok,
+					Header(no_cache),
+					Header(expires),
 					String::from_utf8(p_content.into_inner()).unwrap()
 				)),
 		}
