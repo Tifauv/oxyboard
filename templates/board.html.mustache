@@ -5,13 +5,6 @@
 		<div class="col-sm-10">
 			<div id="board" class="panel panel-default">
 				<table class="table table-condensed">
-					{{#posts}}
-					<tr>
-						<td class="post-author" title="{{user_agent}}">{{info}}</td>
-						<td class="post-time"   title="{{date}}">{{clock}}</td>
-						<td class="post-message text-justify">{{{message}}}</td>
-					</tr>
-					{{/posts}}
 				</table>
 			</div>
 		</div>
@@ -34,8 +27,47 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script>
+	function showSuccessFeedback(p_message) {
+		addAlert("success", p_message);
+		setTimeout(closeAlert, 2000);
+	}
+
+	function showWarningFeedback(p_message) {
+		addAlert("warning", p_message);
+		setTimeout(closeAlert, 8000);
+	}
+
+	function addAlert(p_type, p_message) {
+		$("<div/>", {
+			id     : "feedback-alert",
+			"class": "alert alert-dismissible alert-" + p_type,
+			role   : "alert",
+			html   : "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>" + p_message
+		}).appendTo("#feedback");
+	}
+
+	function closeAlert() {
+		$("#feedback-alert").alert("close");
+	}
+
+	function postToHtml(p_post) {
+		var id         = p_post.attr("id"),
+			time       = p_post.attr("time"),
+			date       = time.substring(6,8) + "/" + time.substring(4,6) + "/" + time.substring(0,4),
+			clock      = time.substring(8,10) + ":" + time.substring(10,12) + ":" + time.substring(12),
+			user_agent = p_post.find("info").text(),
+			login      = p_post.find("login").text(),
+			author     = (login.length == 0 ? user_agent.substring(0, 16) : login),
+			message    = p_post.find("message").text();
+		return "<tr id=\"post-" + id + "\">"
+			+ "<td class=\"post-author\" title=\"" + user_agent + "\">" + author + "</td>"
+			+ "<td class=\"post-time\" title=\"" + date + "\">" + clock + "</td>"
+			+ "<td class=\"post-message text-justify\">" + message + "</td>"
+			+ "</tr>";
+	}
+
 	$(document).ready(function() {
-    	displayBoard();
+    	loadBoard();
 
 		$("#post-form").submit(function() {
 			console.log("Submitting the form...");
@@ -44,58 +76,71 @@
 				data    : $('#post-form').serialize(),
 				type    : "POST",
 				dataType: "text"
-			}).done(messagePosted)
-			.fail(messageError);
+			}).done(function(p_response) {
+				showSuccessFeedback("Message ajouté");
+				updateBoard();
+			}).fail(function(p_response, p_status, p_message) {
+				showWarningFeedback("<strong>Erreur&nbsp;:</strong> " + p_message);
+			});
 			console.log("POST request sent.");
 			return false;
     	});
 
-		function messagePosted(p_response) {
-			console.log("--Success");
-			console.log("  response: " + p_response);
-			showSuccessFeedback("Message ajouté");
+		function loadBoard() {
+			console.log("Loading board...");
+			$.ajax({
+				url     : "/backend",
+				dataType: "xml"
+			}).done(function(p_response) {
+				var newPostsHtml = "";
+				$(p_response).find("post")
+					.nextAll()
+					.each(function() {
+						newPostsHtml = postToHtml($(this)) + newPostsHtml;
+					});
+				if (newPostsHtml.length > 0) {
+					$("#board table").append(newPostsHtml);
+				}
+			}).fail(function(p_response, p_status, p_message) {
+				console.log("Backend retrieval failed");
+				console.log("  message: " + p_message);
+				console.log("   status: " + p_status);
+			});
+
+    		$("#message").val("");
+    		$("#message").focus();
+			console.log("Board loaded.");
 		}
 
-		function messageError(p_response, p_status, p_message) {
-			console.log("--Error");
-			console.log("  response: " + p_response);
-			console.log("    status: " + p_status);
-			console.log("     error: " + p_message);
-			showWarningFeedback("<strong>Erreur&nbsp;:</strong> " + p_message);
-		}
-
-		function showSuccessFeedback(p_message) {
-			addAlert("success", p_message);
-			setTimeout(closeFeedback, 2000);
-		}
-
-		function showWarningFeedback(p_message) {
-			addAlert("warning", p_message);
-			setTimeout(closeFeedback, 8000);
-		}
-
-		function addAlert(p_type, p_message) {
-			$("<div/>", {
-				id     : "feedback-alert",
-				"class": "alert alert-dismissible alert-" + p_type,
-				role   : "alert",
-				html   : "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>" + p_message
-			}).appendTo("#feedback");
-		}
-
-		function closeFeedback() {
-			$("#feedback-alert").alert("close");
-		}
-
-    	function displayBoard() {
-			console.log("Refreshing board...");
-    		//$('#board').load('ac.htm');
-    		$('#message').val('');
-    		$('#message').focus();
+		function updateBoard() {
+			console.log("Updating board...");
+			var lastId = $("#board tr:last").attr("id").replace("post-", "");
+			console.log("last_id: " + lastId);
+			$.ajax({
+				url     : "/backend",
+				data    : "last_id=" + lastId,
+				dataType: "xml"
+			}).done(function(p_response) {
+				var newPostsHtml = "";
+				$(p_response).find("post[id='" + lastId + "']")
+					.prevAll()
+					.each(function() {
+						newPostsHtml += postToHtml($(this));
+					});
+				// If there are posts to add, append them
+				if (newPostsHtml.length > 0) {
+					$("#board table").append(newPostsHtml);
+					$("#message").val("");
+					$("#message").focus();
+				}
+			}).fail(function(p_response, p_status, p_message) {
+				console.log("Backend retrieval failed");
+				console.log("  message: " + p_message);
+				console.log("   status: " + p_status);
+			});
 			console.log("Board refreshed.");
-    	}
-    	//setInterval(displayBoard, 4000);
-
+		}
+		setInterval(updateBoard, 8000);
 	});
 	</script>
 
