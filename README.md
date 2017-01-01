@@ -19,7 +19,7 @@ The HTTP server part is handled by [Iron](https://github.com/iron/iron "Iron on 
 
 ### API
 
-For now, there is no web interface. The development effort is put on core features.
+For now, there is only a basic web interface. The development effort is put on core features.
 
 Basically, a chat room needs two types of requests:
 
@@ -77,8 +77,7 @@ Using this simple but powerfull mechanism, it is possible to follow multiple int
 
 ## I want to get it !
 
-Being writen in Rust, you need the [Rustc compiler](https://www.rust-lang.org/fr/downloads.html).
-It should include the `Cargo` builder.
+Being writen in Rust, you need the [Rustc compiler](https://www.rust-lang.org/fr/downloads.html) version 1.13 minimum to build the project. Rust distributions now come with the `Cargo` builder.
 
 Then, you should [get the code on GitHub](https://github.com/Tifauv/oxyboard).
 A `cargo run` will take care of downloading the dependencies, building all that and starting a board
@@ -87,4 +86,3 @@ on 0.0.0.0:8080.
 ## Documentation
 
 You can use `cargo doc` to locally build the documentation. It will be created in the target/doc directory.
-
