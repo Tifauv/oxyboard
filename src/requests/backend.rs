@@ -6,7 +6,7 @@ use core::{ History, Post };
 use iron::prelude::*;
 use mustache::MapBuilder;
 use persistent::State;
-use requests::template_engine::build_response;
+use requests::templates::build_response;
 
 
 #[derive(RustcEncodable)]

@@ -14,7 +14,7 @@ use oxyboard::config;
 use oxyboard::config::{ Config, ConfigLoader, TomlConfigLoader };
 use oxyboard::core::{ History, HistoryRecorder };
 use oxyboard::requests::{ about, backend, board, default, post };
-use oxyboard::requests::template_engine::TemplateEngine;
+use oxyboard::requests::templates::TemplateEngine;
 use oxyboard::storage::{ StorageBackend, CsvFileStorage };
 use persistent::State;
 use router::Router;

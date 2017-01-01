@@ -8,4 +8,4 @@ pub mod board;
 pub mod default;
 pub mod headers;
 pub mod post;
-pub mod template_engine;
+pub mod templates;
