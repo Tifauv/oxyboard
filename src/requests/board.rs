@@ -11,6 +11,7 @@ use requests::template_engine::build_response;
 
 #[derive(RustcEncodable)]
 struct PostViewModel<'a> {
+	id         : u64,
 	login      : &'a str,
 	info       : String,
 	user_agent : &'a str,
@@ -23,6 +24,7 @@ struct PostViewModel<'a> {
 impl<'a> PostViewModel<'a> {
 	fn new(p_post: &Post) -> PostViewModel {
 		PostViewModel {
+			id         : p_post.id(),
 			login      : p_post.login(),
 			info       : PostViewModel::truncate_user_agent(p_post.user_agent()),
 			user_agent : p_post.user_agent(),
