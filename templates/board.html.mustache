@@ -69,6 +69,10 @@
 	$(document).ready(function() {
     	loadBoard();
 
+		// Used as a global lock to prevent several simultaneous updates to the
+		// board DOM.
+		var g_updating = false;
+
 		$("#post-form").submit(function() {
 			console.log("Submitting the form...");
 			$.ajax({
@@ -87,7 +91,6 @@
     	});
 
 		function loadBoard() {
-			console.log("Loading board...");
 			$.ajax({
 				url     : "/backend",
 				dataType: "xml"
@@ -109,25 +112,41 @@
 
     		$("#message").val("");
     		$("#message").focus();
-			console.log("Board loaded.");
 		}
 
 		function updateBoard() {
-			console.log("Updating board...");
+			/* Do nothing if there already is an update running */
+			if (g_updating === true)
+				return;
+
+			// Lock updating
+			g_updating = true;
+
 			var lastId = $("#board tr:last").attr("id").replace("post-", "");
-			console.log("last_id: " + lastId);
 			$.ajax({
-				url     : "/backend",
-				data    : "last_id=" + lastId,
+				url     : "/backend/since/" + lastId,
 				dataType: "xml"
 			}).done(function(p_response) {
 				var newPostsHtml = "";
-				$(p_response).find("post[id='" + lastId + "']")
-					.prevAll()
-					.each(function() {
+				var posts;
+
+				/* Get the reference post. This is one with the lastId.
+				 * If there is none, read from the last post.
+				 */
+				var refPost = $(p_response).find("post[id='" + lastId + "']");
+				if (refPost.length > 0) {
+					refPost.prevAll().each(function() {
 						newPostsHtml += postToHtml($(this));
 					});
-				// If there are posts to add, append them
+				}
+				else {
+					$(p_response).find("post").each(function() {
+						newPostsHtml = postToHtml($(this)) + newPostsHtml;
+					});
+				}
+
+				/* If there are posts to add, append them to the board DOM
+				 * then reset the form. */
 				if (newPostsHtml.length > 0) {
 					$("#board table").append(newPostsHtml);
 					$("#message").val("");
@@ -137,8 +156,10 @@
 				console.log("Backend retrieval failed");
 				console.log("  message: " + p_message);
 				console.log("   status: " + p_status);
+			}).always(function() {
+				// Release the update lock
+				g_updating = false;
 			});
-			console.log("Board refreshed.");
 		}
 		setInterval(updateBoard, 8000);
 	});
