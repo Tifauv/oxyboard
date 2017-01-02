@@ -68,6 +68,14 @@
 			+ "</tr>";
 	}
 
+	function insertAtCaret(p_element, p_text) {
+    	var caretPos = p_element[0].selectionStart,
+        	currentValue = p_element.val();
+
+    	p_element.val(currentValue.substring(0, caretPos) + p_text + currentValue.substring(caretPos));
+		p_element.focus();
+	}
+
 	$(document).ready(function() {
     	loadBoard();
 
@@ -103,9 +111,24 @@
 					.each(function() {
 						newPostsHtml = postToHtml($(this)) + newPostsHtml;
 					});
+
+				// Fill the board display with the build content
 				if (newPostsHtml.length > 0) {
 					$("#board table").append(newPostsHtml);
 				}
+
+				// Add a click event handler to the authors
+				$("#board").on("click", ".post-author", function() {
+					console.log("Selected author " + $(this).text());
+					insertAtCaret( $("#message"), $(this).text() + "< ");
+				});
+
+				// Add a click event handler to the clocks
+				$("#board").on("click", ".post-time", function() {
+					console.log("Selected clock " + $(this).text());
+					insertAtCaret( $("#message"), $(this).text() + " ");
+				});
+
 			}).fail(function(p_response, p_status, p_message) {
 				console.log("Backend retrieval failed");
 				console.log("  message: " + p_message);
