@@ -93,7 +93,6 @@
 				type    : "POST",
 				dataType: "text"
 			}).done(function(p_response) {
-				showSuccessFeedback("Message ajouté");
 				updateBoard();
 			}).fail(function(p_response, p_status, p_message) {
 				showWarningFeedback("<strong>Erreur&nbsp;:</strong> " + p_message);
