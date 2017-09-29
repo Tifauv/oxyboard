@@ -61,11 +61,48 @@ pub fn full_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 
 
 /**
- * Handles GET requests for a partial backend.
+ * Handles GET requests for a backend containing the last n messages.
  *
- * Builds the XML backend and returns it.
+ * Uses a :size URL parameter.
  */
-pub fn partial_backend_handler(p_request: &mut Request) -> IronResult<Response> {
+pub fn sized_backend_handler(p_request: &mut Request) -> IronResult<Response> {
+	// Get access to the the shared history
+	let lock = p_request.get::<State<History>>().unwrap();
+	let history = lock.read().unwrap();
+
+	let size_str = p_request.extensions.get::<Router>().unwrap().find("size").unwrap_or("100");
+	let size = usize::from_str_radix(size_str, 10).unwrap_or(100);
+
+	let data = MapBuilder::new()
+		.insert_str("board_name", history.board_name())
+		.insert_vec("posts",      |mut builder| {
+				for post in history.iter()
+						.rev()
+						.take(size)
+						.map(|ref p| PostViewModel::new(&p))
+						.collect::<Vec<_>>() {
+					builder = builder.push(&post).unwrap();
+				}
+				builder
+			})
+		.build();
+
+	Ok(build_response("backend.xml", data))
+}
+
+
+/**
+ * Handles GET requests for a backend since a given post id.
+ *
+ * Uses a :lastId URL parameter.
+ *
+ * Builds the XML backend containing only the posts having an id
+ * greater than the given one. If no :lastId parameter is found,
+ * uses "1" as the lastId.
+ *
+ * @returns the backend
+ */
+pub fn lastid_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	// Get access to the the shared history
 	let lock = p_request.get::<State<History>>().unwrap();
 	let history = lock.read().unwrap();

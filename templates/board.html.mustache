@@ -103,7 +103,7 @@
 
 		function loadBoard() {
 			$.ajax({
-				url     : "/backend",
+				url     : "/backend/last/100",
 				dataType: "xml"
 			}).done(function(p_response) {
 				var newPostsHtml = "";

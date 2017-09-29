@@ -48,12 +48,13 @@ fn load_config(p_file: &str) -> Config {
  */
 fn router() -> Router {
 	let mut router = Router::new();
-	router.get("/",                      default::default_handler,         "default");
-	router.get("/about",                 about::about_handler,             "about");
-	router.get("/board",                 board::board_handler,             "board");
-	router.post("/post",                 post::post_handler,               "post_message");
-	router.get("/backend",               backend::full_backend_handler,    "full_backend");
-	router.get("/backend/since/:lastId", backend::partial_backend_handler, "partial_backend");
+	router.get("/",                      default::default_handler,        "default");
+	router.get("/about",                 about::about_handler,            "about");
+	router.get("/board",                 board::board_handler,            "board");
+	router.post("/post",                 post::post_handler,              "post_message");
+	router.get("/backend",               backend::full_backend_handler,   "full_backend");
+	router.get("/backend/last/:size",    backend::sized_backend_handler,  "sized_backend");
+	router.get("/backend/since/:lastId", backend::lastid_backend_handler, "lastId_backend");
 	router
 }
 
