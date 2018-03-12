@@ -4,10 +4,11 @@
 
 use config::{Config, ConfigLoader};
 use std::fs::File;
+use std::error::Error;
 use std::io;
 use std::io::prelude::*;
-use std::io::{BufReader, Error, ErrorKind};
-use toml::{decode, Parser, Value};
+use std::io::{BufReader, Error as IoError, ErrorKind};
+use toml;
 
 
 pub struct TomlConfigLoader {
@@ -43,23 +44,21 @@ impl ConfigLoader for TomlConfigLoader {
 	fn load(&self) -> io::Result<Config> {
 		let file_content = self.read_file()?;
 
-		let mut parser = Parser::new(&file_content);
-		match parser.parse() {
-			Some(decoded) => {
-				match decode(Value::Table(decoded)) {
-					Some(config) => Ok(config),
-					None => Err(Error::new(ErrorKind::InvalidData, "Invalid configuration"))
-				}
-			},
-			None => {
+        match toml::from_str(&file_content) {
+            Ok(decoded) => {
+                let config: Config = decoded;
+                Ok(config)
+            },
+            Err(err) => {
 				let mut error_msg = format!("Malformed configuration file '{}':", self.file);
-            	for err in &parser.errors {
-                	let (loline, locol) = parser.to_linecol(err.lo);
-                	let (hiline, hicol) = parser.to_linecol(err.hi);
-					error_msg = error_msg + &format!(" [l{}c{}-l{}c{}: {}]", loline, locol, hiline, hicol, err.desc);
-				}
-				Err(Error::new(ErrorKind::InvalidData, error_msg))
-			}
-		}
+                let desc = err.description();
+                let details = match err.line_col() {
+                    Some((line, col)) => format!(" [l{}c{}]: {}]", line, col, desc),
+                    None              => format!(" [{}]", desc)
+                };
+                
+				Err(IoError::new(ErrorKind::InvalidData, error_msg + &details))
+            }
+        }
 	}
 }

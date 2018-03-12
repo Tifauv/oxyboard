@@ -4,6 +4,7 @@
 use csv;
 use core::{History, Post};
 use storage::StorageBackend;
+use std::error::Error;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io;
@@ -75,11 +76,11 @@ impl StorageBackend for CsvFileStorage {
 					.append(true)
 					.open(&self.file_path())? );
 
-		writer.encode(p_post).and(Ok(self)).map_err(|e| {
-			match e {
-				csv::Error::Encode(msg) => io::Error::new(ErrorKind::Other, format!("Failed to encode line in history file '{}': {}", self.file_path(), msg)),
-				csv::Error::Io(err)     => err,
-				_                       => io::Error::new(ErrorKind::Other, "Error while saving post")
+		writer.serialize(p_post).and(Ok(self)).map_err(|e| {
+			match e.kind() {
+				&csv::ErrorKind::Serialize(ref msg) => io::Error::new(ErrorKind::Other, format!("Failed to encode line in history file '{}': {}", self.file_path(), &msg)),
+				&csv::ErrorKind::Io(ref err)        => io::Error::new(err.kind(), err.description()),
+				_                                   => io::Error::new(ErrorKind::Other, "Error while saving post")
 			}
 		})
 	}
@@ -94,20 +95,20 @@ impl StorageBackend for CsvFileStorage {
 	 *
 	 */
 	fn load_history(&self, p_history: &mut History) -> io::Result<usize> {
-		let mut reader = csv::Reader::from_reader(fs::File::open(&self.file_path())? )
-				.has_headers(false);
+		let mut reader = csv::ReaderBuilder::new()
+				.has_headers(false)
+                .from_path(self.file_path())?;
 
 		let mut count = 0;
-		for line in reader.decode() {
+		for line in reader.deserialize() {
 			match line {
 				Ok(post) => {
 					p_history.add_full_post(post);
 					count += 1;
 				},
-				Err(err) => match err {
-					csv::Error::Decode(msg) => warn_msg!("Failed to decode line in history file '{}': {}", self.file_path(), msg),
-					csv::Error::Parse(err)  => warn_msg!("Failed to parse history file '{}': {}", self.file_path(), err),
-					csv::Error::Io(err)     => warn_msg!("Failed to read history file '{}': {}", self.file_path(), err),
+				Err(err) => match err.kind() {
+					&csv::ErrorKind::Serialize(ref err) => warn_msg!("Failed to parse history file '{}': {}", self.file_path(), &err),
+					&csv::ErrorKind::Io(ref err)        => warn_msg!("Failed to read history file '{}': {}",  self.file_path(), &err),
 					_ => {}
 				}
 			}

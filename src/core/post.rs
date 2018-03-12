@@ -84,7 +84,7 @@
  *
  * All these fields are immutable.
  */
-#[derive(RustcDecodable, RustcEncodable)]
+#[derive(Serialize, Deserialize)]
 pub struct Post {
 	/// The post's unique identifier
 	id: u64,

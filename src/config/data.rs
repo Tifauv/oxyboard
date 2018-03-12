@@ -1,3 +1,5 @@
+//use serde::Deserialize;
+
 /**
  * This the root of the configuration structure.
  *
@@ -31,7 +33,7 @@
  * assert_eq!(cfg.ui.templates_dir,   String::from("templates"));
  * ```
  */
-#[derive(Debug,RustcDecodable)]
+#[derive(Debug,Deserialize)]
 pub struct Config {
 	pub server  : ServerParams,
 	pub board   : BoardParams,
@@ -56,7 +58,7 @@ pub struct Config {
  * assert_eq!(server_cfg.port, 8080);
  * ```
  */
-#[derive(Debug,RustcDecodable)]
+#[derive(Debug,Deserialize)]
 pub struct ServerParams {
 	pub ip   : String,
 	pub port : u16,
@@ -79,7 +81,7 @@ pub struct ServerParams {
  * assert_eq!(board_cfg.history_size, 512);
  * ```
  */
-#[derive(Debug,RustcDecodable)]
+#[derive(Debug,Deserialize)]
 pub struct BoardParams {
 	pub name         : String,
 	pub history_size : usize,
@@ -100,7 +102,7 @@ pub struct BoardParams {
  * assert_eq!(storage_cfg.data_dir, String::from("data"));
  * ```
  */
-#[derive(Debug,RustcDecodable)]
+#[derive(Debug,Deserialize)]
 pub struct StorageParams {
 	pub data_dir : String,
 }
@@ -120,7 +122,7 @@ pub struct StorageParams {
  * assert_eq!(ui_cfg.templates_dir, String::from("templates"));
  * ```
  */
-#[derive(Debug,RustcDecodable)]
+#[derive(Debug,Deserialize)]
 pub struct UiParams {
 	pub templates_dir : String,
 }

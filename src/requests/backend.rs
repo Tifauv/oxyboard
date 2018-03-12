@@ -10,7 +10,7 @@ use requests::templates::build_response;
 use router::Router;
 
 
-#[derive(RustcEncodable)]
+#[derive(Serialize)]
 struct PostViewModel<'a> {
 	id         : u64,
 	time       : &'a str,
@@ -44,7 +44,7 @@ pub fn full_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	let history = lock.read().unwrap();
 
 	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name())
+		.insert_str("board_name", history.board_name().clone())
 		.insert_vec("posts",      |mut builder| {
 				for post in history.iter()
 						.rev()
@@ -74,7 +74,7 @@ pub fn sized_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	let size = usize::from_str_radix(size_str, 10).unwrap_or(100);
 
 	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name())
+		.insert_str("board_name", history.board_name().clone())
 		.insert_vec("posts",      |mut builder| {
 				for post in history.iter()
 						.rev()
@@ -111,7 +111,7 @@ pub fn lastid_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	let last_id = u64::from_str_radix(last_id_str, 10).unwrap_or(1);
 
 	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name())
+		.insert_str("board_name", history.board_name().clone())
 		.insert_vec("posts",      |mut builder| {
 				for post in history.iter()
 						.filter(|p| p.id() > last_id)

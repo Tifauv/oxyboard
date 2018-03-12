@@ -4,20 +4,22 @@ version = "0.1.0"
 authors = [ "Olivier Serve <tifauv@gmail.com>" ]
 
 [dependencies]
-clap            = "2.18.0"
-csv             = "0.14.7"
-iron            = "0.4.0"
-mount           = "0.2.1"
-mustache        = "0.8.0"
-persistent      = "0.2.0"
-router          = "0.4.0"
+clap            = "2.29.1"
+csv             = "1.0.0-beta.5"
+iron            = "0.6.0"
+mount           = "0.4.0"
+mustache        = "0.9.0"
+persistent      = "0.4.0"
+router          = "0.6.0"
 rustc-serialize = "0.3.19"
-time            = "0.1.35"
-toml            = "0.2.1"
-urlencoded      = "0.4.1"
+serde			= "1.0"
+serde_derive    = "1.0"
+time            = "0.1.39"
+toml            = "0.4.5"
+urlencoded      = "0.6.0"
 
 [dependencies.hyper]
-version = "0.9"
+version = "0.10"
 default-features = false
 
 [[bin]]

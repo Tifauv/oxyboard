@@ -50,7 +50,7 @@ extern crate iron;
 extern crate mustache;
 extern crate persistent;
 extern crate router;
-extern crate rustc_serialize;
+#[macro_use] extern crate serde_derive;
 extern crate time;
 extern crate toml;
 extern crate urlencoded;

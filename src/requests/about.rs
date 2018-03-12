@@ -20,7 +20,7 @@ pub fn about_handler(p_request: &mut Request) -> IronResult<Response> {
 	let history = lock.read().unwrap();
 
 	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name())
+		.insert_str("board_name", history.board_name().clone())
 		.insert_str("current_page_about", "class=\"active\"")
 		.build();
 

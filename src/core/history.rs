@@ -9,7 +9,7 @@ use std::result::Result;
 use std::collections::vec_deque::{VecDeque, Iter};
 
 
-#[derive(RustcEncodable)]
+#[derive(Deserialize)]
 pub struct HistoryData {
 	pub board_name   : String,
 	pub posts        : VecDeque<Post>,
