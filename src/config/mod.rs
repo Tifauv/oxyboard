@@ -1,6 +1,5 @@
-/*!
- * The configuration data structure and loaders.
- */
+//!
+/// The configuration data structure and loaders.
 pub use self::data::Config;
 pub use self::data::ServerParams;
 pub use self::data::BoardParams;

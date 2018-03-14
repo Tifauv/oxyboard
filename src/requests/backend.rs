@@ -1,6 +1,5 @@
-/*!
- * The handlers for backend requests.
- */
+//!
+/// The handlers for backend requests.
 
 use core::{ History, Post };
 use iron::prelude::*;
@@ -33,11 +32,9 @@ impl<'a> PostViewModel<'a> {
 }
 
 
-/**
- * Handles GET requests for the full backend.
- *
- * Builds the XML backend and returns it.
- */
+/// Handles GET requests for the full backend.
+///
+/// Builds the XML backend and returns it.
 pub fn full_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	// Get access to the the shared history
 	let lock = p_request.get::<State<History>>().unwrap();
@@ -60,11 +57,9 @@ pub fn full_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 }
 
 
-/**
- * Handles GET requests for a backend containing the last n messages.
- *
- * Uses a :size URL parameter.
- */
+/// Handles GET requests for a backend containing the last n messages.
+///
+/// Uses a :size URL parameter.
 pub fn sized_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	// Get access to the the shared history
 	let lock = p_request.get::<State<History>>().unwrap();
@@ -91,17 +86,15 @@ pub fn sized_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 }
 
 
-/**
- * Handles GET requests for a backend since a given post id.
- *
- * Uses a :lastId URL parameter.
- *
- * Builds the XML backend containing only the posts having an id
- * greater than the given one. If no :lastId parameter is found,
- * uses "1" as the lastId.
- *
- * @returns the backend
- */
+/// Handles GET requests for a backend since a given post id.
+///
+/// Uses a :lastId URL parameter.
+///
+/// Builds the XML backend containing only the posts having an id
+/// greater than the given one. If no :lastId parameter is found,
+/// uses "1" as the lastId.
+///
+/// @returns the backend
 pub fn lastid_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 	// Get access to the the shared history
 	let lock = p_request.get::<State<History>>().unwrap();

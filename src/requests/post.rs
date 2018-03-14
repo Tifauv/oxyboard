@@ -1,6 +1,5 @@
-/*!
- * The handlers for post requests.
- */
+//!
+/// The handlers for post requests.
 
 use core::{ History, UserPost };
 use iron::headers::UserAgent;
@@ -13,9 +12,7 @@ use std::result::Result;
 use urlencoded::{ UrlDecodingError, UrlEncodedBody };
 
 
-/**
- * Constructs a new `UserPost` from an iron Request.
- */
+/// Constructs a new `UserPost` from an iron Request.
 fn make_user_post<'a>(p_request:&mut Request) -> Result<UserPost, &'a str> {
 	// Extract the user-agent
 	let mut user_agent = match p_request.headers.get::<UserAgent>() {
@@ -45,13 +42,11 @@ fn url_decode(p_request: &mut Request) -> Result<String, UrlDecodingError> {
 }
 
 
-/**
- * Handler for POST message requests.
- *
- * Extracts the data from the request needed to build a `UserPost` then
- * adds it to the `History` in the request's state. The id assigned to the
- * new post is then returned in the HTTP response.
- */
+/// Handler for POST message requests.
+///
+/// Extracts the data from the request needed to build a `UserPost` then
+/// adds it to the `History` in the request's state. The id assigned to the
+/// new post is then returned in the HTTP response.
 pub fn post_handler(p_request: &mut Request) -> IronResult<Response> {
 	// Get access to the shared history
 	let lock = p_request.get::<State<History>>().unwrap();

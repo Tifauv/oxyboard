@@ -1,6 +1,5 @@
-/*!
- * The middleware that caches the Mustache templates.
- */
+//!
+/// The middleware that caches the Mustache templates.
 
 use std::collections::HashMap;
 use std::io;
@@ -22,44 +21,36 @@ use mustache::Data;
 
 use time;
 
-/**
- * Type used to tag the template name in the `Response` extensions.
- *
- * The type of the associated value is `String`.
- */
+/// Type used to tag the template name in the `Response` extensions.
+///
+/// The type of the associated value is `String`.
 struct TemplateName;
 impl Key for TemplateName {
 	type Value = String;
 }
 
 
-/**
- * Type used to tag the template data in the `Response` extensions.
- *
- * The type of the associated value is `mustache::Data`.
- */
+/// Type used to tag the template data in the `Response` extensions.
+///
+/// The type of the associated value is `mustache::Data`.
 struct TemplateData;
 impl Key for TemplateData {
 	type Value = Data;
 }
 
 
-/**
- * Type used to tag the template type in the `Response` extensions.
- *
- * Tht type of the associated value is `iron::mime::Mime`.
- */
+/// Type used to tag the template type in the `Response` extensions.
+///
+/// Tht type of the associated value is `iron::mime::Mime`.
 struct TemplateType;
 impl Key for TemplateType {
 	type Value = Mime;
 }
 
 
-/**
- * The wrapping `Handler` associated with a request.
- *
- * It implements a method to create a response from an instanciated template page.
- */
+/// The wrapping `Handler` associated with a request.
+///
+/// It implements a method to create a response from an instanciated template page.
 pub struct TemplateHandler<H: Handler> {
     template : TemplateEngine,
     handler  : H,
@@ -94,10 +85,8 @@ impl<H: Handler> TemplateHandler<H> {
 }
 
 impl<H: Handler> Handler for TemplateHandler<H> {
-	/**
-	 * Retrieves the template's name and data set in the response extensions,
-	 * then instanciates the template to create the final page data.
-	 */
+	/// Retrieves the template's name and data set in the response extensions,
+	/// then instanciates the template to create the final page data.
 	fn handle(&self, p_request: &mut Request) -> IronResult<Response> {
         let response = self.handler.handle(p_request)?;
 
@@ -116,9 +105,7 @@ impl<H: Handler> Handler for TemplateHandler<H> {
 }
 
 
-/**
- *
- */
+/// The template engine.
 pub struct TemplateEngine {
     templates : HashMap<String, mustache::Template>,
 }
@@ -161,9 +148,7 @@ impl TemplateEngine {
 }
 
 impl AroundMiddleware for TemplateEngine {
-	/**
-	 * Wraps the given handler with a TemplateHandler.
-	 */
+	/// Wraps the given handler with a TemplateHandler.
 	fn around(self, p_handler: Box<Handler>) -> Box<Handler> {
 		Box::new(TemplateHandler {
             template : self,

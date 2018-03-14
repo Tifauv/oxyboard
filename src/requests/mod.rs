@@ -1,6 +1,5 @@
-/*!
- * The handlers for the board's accepted requests.
- */
+//!
+/// The handlers for the board's accepted requests.
 
 pub mod about;
 pub mod backend;

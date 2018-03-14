@@ -1,6 +1,5 @@
-/*!
- * Loads the configuration from a TOML file.
- */
+//!
+/// Loads the configuration from a TOML file.
 
 use config::{Config, ConfigLoader};
 use std::fs::File;
@@ -24,9 +23,7 @@ impl TomlConfigLoader {
 	}
 
 
-	/**
-	 * Reads the content of the configuration file.
-	 */
+	/// Reads the content of the configuration file.
 	fn read_file(&self) -> io::Result<String> {
 		let file = File::open(&self.file)?;
 		let mut reader = BufReader::new(file);
@@ -38,9 +35,7 @@ impl TomlConfigLoader {
 
 
 impl ConfigLoader for TomlConfigLoader {
-	/**
-	 * Reads the configuration file and parses its content.
-	 */
+	/// Reads the configuration file and parses its content.
 	fn load(&self) -> io::Result<Config> {
 		let file_content = self.read_file()?;
 

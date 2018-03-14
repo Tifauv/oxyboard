@@ -23,12 +23,10 @@ use std::io::Error;
 use std::path::Path;
 
 
-/**
- * Loads the configuration from the given file.
- *
- * If the configuration cannot be loaded, the default configuration from
- * `oxyboard::config::default()` is returned.
- */
+/// Loads the configuration from the given file.
+///
+/// If the configuration cannot be loaded, the default configuration from
+/// `oxyboard::config::default()` is returned.
 fn load_config(p_file: &str) -> Config {
 	TomlConfigLoader::new(String::from(p_file)).load()
 			.and_then(|c: Config| {
@@ -43,9 +41,7 @@ fn load_config(p_file: &str) -> Config {
 }
 
 
-/**
- * Creates a router for the website requests of the application.
- */
+/// Creates a router for the website requests of the application.
 fn router() -> Router {
 	let mut router = Router::new();
 	router.get("/",                      default::default_handler,        "default");
@@ -59,9 +55,7 @@ fn router() -> Router {
 }
 
 
-/**
- *
- */
+/// Mounts the template engine on /
 fn mount(p_config: &Config) -> Mount {
 	// Create the template engine
 	let template_engine = TemplateEngine::new(&p_config.ui.templates_dir).ok().expect("Failed to load the template files !");
@@ -72,9 +66,7 @@ fn mount(p_config: &Config) -> Mount {
 }
 
 
-/**
- * Main function that sets the Iron server up and starts it.
- */
+/// Main function that sets the Iron server up and starts it.
 fn main() {
 	let matches = App::new("Oxyboard")
 	    	.version("0.1.0")

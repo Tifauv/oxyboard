@@ -1,6 +1,6 @@
-/*!
- * The data storage interfaces and facilities.
- */
+//!
+/// The data storage interfaces and facilities.
+
 pub use self::backend::StorageBackend;
 pub use self::file_csv::CsvFileStorage;
 
