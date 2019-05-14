@@ -108,7 +108,7 @@ fn main() {
 
 	// Start the server
 	let _server = Iron::new(chain).http((config.server.ip.as_ref(), config.server.port)).unwrap();
-	info_msg!("Board '{name}' listening on {ip}:{port}. Use Ctrl-C to abort.",
+	info_msg!("Board '{name}' ready at http://{ip}:{port}. Use Ctrl-C to abort.",
 			name = config.board.name,
 			ip   = config.server.ip,
 			port = config.server.port);
