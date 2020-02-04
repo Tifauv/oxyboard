@@ -149,7 +149,7 @@ impl TemplateEngine {
 
 impl AroundMiddleware for TemplateEngine {
 	/// Wraps the given handler with a TemplateHandler.
-	fn around(self, p_handler: Box<Handler>) -> Box<Handler> {
+	fn around(self, p_handler: Box<dyn Handler>) -> Box<dyn Handler> {
 		Box::new(TemplateHandler {
             template : self,
             handler  : p_handler

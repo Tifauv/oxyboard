@@ -81,4 +81,4 @@ impl HeaderFormat for XPostId {
 /// let mut headers = Headers::new();
 /// headers.set(XPostError("Bad user command".to_owned()));
 /// ```
- header! { (XPostError, "X-Post-Error") => [String] }
+header! { (XPostError, "X-Post-Error") => [String] }

@@ -170,7 +170,7 @@ impl History {
 
 
 	/// Adds a `HistoryListener` to be notified of events.
-	pub fn add_listener(&mut self, p_listener: Box<HistoryListener + Send + Sync>) {
+	pub fn add_listener(&mut self, p_listener: Box<dyn HistoryListener + Send + Sync>) {
 		self.events.add_listener(p_listener);
 	}
 }
@@ -202,7 +202,7 @@ pub trait HistoryListener {
 /// a separate interface. If you need to allow several listeners, this
 /// is your guy !
 struct HistoryEventDispatcher {
-	listeners: Vec<Box<HistoryListener + Send + Sync>>
+	listeners: Vec<Box<dyn HistoryListener + Send + Sync>>
 }
 
 impl HistoryEventDispatcher {
@@ -214,7 +214,7 @@ impl HistoryEventDispatcher {
 	}
 
 	/// Adds a listener to this dispatcher.
-	fn add_listener(&mut self, p_listener: Box<HistoryListener + Send + Sync>) {
+	fn add_listener(&mut self, p_listener: Box<dyn HistoryListener + Send + Sync>) {
 		self.listeners.push(p_listener);
 	}
 }

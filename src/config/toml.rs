@@ -45,7 +45,7 @@ impl ConfigLoader for TomlConfigLoader {
                 Ok(config)
             },
             Err(err) => {
-				let mut error_msg = format!("Malformed configuration file '{}':", self.file);
+				let error_msg = format!("Malformed configuration file '{}':", self.file);
                 let desc = err.description();
                 let details = match err.line_col() {
                     Some((line, col)) => format!(" [l{}c{}]: {}]", line, col, desc),
