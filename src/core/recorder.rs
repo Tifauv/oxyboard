@@ -1,6 +1,5 @@
 use core::history::HistoryListener;
 use core::post::Post;
-use std::error::Error;
 use storage::StorageBackend;
 
 
@@ -27,7 +26,7 @@ impl<T: StorageBackend> HistoryListener for HistoryRecorder<T> {
 			Ok(_)  => {},
 			Err(e) => warn_msg!("Failed to record post #{id}: {err}",
 					id  = p_post.id(),
-					err = e.description())
+					err = e.to_string())
 		}
 	}
 

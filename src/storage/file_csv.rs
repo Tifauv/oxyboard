@@ -4,7 +4,6 @@
 use csv;
 use core::{History, Post};
 use storage::StorageBackend;
-use std::error::Error;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io;
@@ -71,7 +70,7 @@ impl StorageBackend for CsvFileStorage {
 		writer.serialize(p_post).and(Ok(self)).map_err(|e| {
 			match e.kind() {
 				&csv::ErrorKind::Serialize(ref msg) => io::Error::new(ErrorKind::Other, format!("Failed to encode line in history file '{}': {}", self.file_path(), &msg)),
-				&csv::ErrorKind::Io(ref err)        => io::Error::new(err.kind(), err.description()),
+				&csv::ErrorKind::Io(ref err)        => io::Error::new(err.kind(), err.to_string()),
 				_                                   => io::Error::new(ErrorKind::Other, "Error while saving post")
 			}
 		})

@@ -3,7 +3,6 @@
 
 use config::{Config, ConfigLoader};
 use std::fs::File;
-use std::error::Error;
 use std::io;
 use std::io::prelude::*;
 use std::io::{BufReader, Error as IoError, ErrorKind};
@@ -46,7 +45,7 @@ impl ConfigLoader for TomlConfigLoader {
             },
             Err(err) => {
 				let error_msg = format!("Malformed configuration file '{}':", self.file);
-                let desc = err.description();
+                let desc = err.to_string();
                 let details = match err.line_col() {
                     Some((line, col)) => format!(" [l{}c{}]: {}]", line, col, desc),
                     None              => format!(" [{}]", desc)
