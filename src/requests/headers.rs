@@ -60,25 +60,25 @@ impl HeaderFormat for XPostId {
 }
 
 
-/// `X-Post-Error` header, used by the application to return an error message
-/// that occured when processing a POST message request.
-/// The error message is unstructured plain text.
-///
-/// # ABNF
-/// ```plain
-/// X-Post-Error = token
-/// ```
-///
-/// # Example values
-/// * `Bad user command`
-///
-/// # Example
-/// ```plain
-/// extern crate hyper;
-/// use hyper::header::Headers;
-/// use oxyboard::requests::headers::XPostError;
-///
-/// let mut headers = Headers::new();
-/// headers.set(XPostError("Bad user command".to_owned()));
-/// ```
+// `X-Post-Error` header, used by the application to return an error message
+// that occured when processing a POST message request.
+// The error message is unstructured plain text.
+//
+// # ABNF
+// ```plain
+// X-Post-Error = token
+// ```
+//
+// # Example values
+// * `Bad user command`
+//
+// # Example
+// ```plain
+// extern crate hyper;
+// use hyper::header::Headers;
+// use oxyboard::requests::headers::XPostError;
+//
+// let mut headers = Headers::new();
+// headers.set(XPostError("Bad user command".to_owned()));
+// ```
 header! { (XPostError, "X-Post-Error") => [String] }
