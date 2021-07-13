@@ -13,7 +13,7 @@ use mount::Mount;
 use oxyboard::config;
 use oxyboard::config::{ Config, ConfigLoader, TomlConfigLoader };
 use oxyboard::core::{ History, HistoryRecorder };
-use oxyboard::requests::{ about, backend, board, default, post };
+use oxyboard::requests::{ about, backend, board, clconfig, default, post };
 use oxyboard::requests::templates::TemplateEngine;
 use oxyboard::storage::{ StorageBackend, CsvFileStorage };
 use persistent::State;
@@ -47,6 +47,7 @@ fn router() -> Router {
 	router.get("/",                      default::default_handler,        "default");
 	router.get("/about",                 about::about_handler,            "about");
 	router.get("/board",                 board::board_handler,            "board");
+	router.get("/client_config",         clconfig::clconfig_handler,      "client_config");
 	router.post("/post",                 post::post_handler,              "post_message");
 	router.get("/backend",               backend::full_backend_handler,   "full_backend");
 	router.get("/backend/last/:size",    backend::sized_backend_handler,  "sized_backend");

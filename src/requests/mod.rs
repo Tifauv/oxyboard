@@ -4,6 +4,7 @@
 pub mod about;
 pub mod backend;
 pub mod board;
+pub mod clconfig;
 pub mod default;
 pub mod headers;
 pub mod post;
