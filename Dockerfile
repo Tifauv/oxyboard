@@ -1,5 +1,7 @@
+# Build image
 FROM rust:1.54 as builder
 
+# Target musl libC because we will deploy on Alpine
 RUN rustup target add x86_64-unknown-linux-musl
 RUN apt update && apt install -y musl-tools musl-dev
 
@@ -16,23 +18,17 @@ RUN rm ./target/x86_64-unknown-linux-musl/release/deps/oxyboard*
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
 
+# Final image
 FROM alpine
 MAINTAINER Olivier Serve <tifauv@gmail.com>
 LABEL org.opencontainers.image.authors="tifauv.gmail.com"
 
-ENV APP_HOME=/app \
-    APP_USER=oxyboard \
-	APP_GROUP=oxyboard
+ENV APP_HOME=/app
 
-RUN addgroup --gid 1042 ${APP_GROUP} && \
-	adduser --disabled-password --uid 1042 --ingroup ${APP_GROUP} --gecos 'Oxyboard service account' --home "${APP_HOME}" ${APP_USER} && \
-	mkdir -pv "${APP_HOME}/bin" && \
-	mkdir -pv "${APP_HOME}/data" && \
-	chown -R ${APP_USER}:${APP_GROUP} "${APP_HOME}"
+RUN mkdir -pv "${APP_HOME}/bin" && \
+	mkdir -pv "${APP_HOME}/data"
 
-USER ${APP_USER}:${APP_GROUP}
 WORKDIR ${APP_HOME}
-
 COPY --from=builder /oxyboard/target/x86_64-unknown-linux-musl/release/oxyboard ./bin
 COPY config    ./config
 COPY templates ./templates
