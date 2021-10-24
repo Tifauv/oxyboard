@@ -1,6 +1,6 @@
-use core::history::HistoryListener;
-use core::post::Post;
-use storage::StorageBackend;
+use crate::core::history::HistoryListener;
+use crate::core::post::Post;
+use crate::storage::StorageBackend;
 
 
 /// An history listener that records all new posts using a `StorageBackend`.

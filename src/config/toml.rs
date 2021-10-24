@@ -1,7 +1,7 @@
 //!
 /// Loads the configuration from a TOML file.
 
-use config::{Config, ConfigLoader};
+use crate::config::{Config, ConfigLoader};
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;

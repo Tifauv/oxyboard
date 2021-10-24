@@ -1,5 +1,4 @@
-{{> header_inc.html}}
-{{> navbar_inc.html}}
+{{#*inline "page"}}
 
 	<div id="content" class="container">
 		<div id="config" class="col-sm-10 well well-lg">
@@ -8,4 +7,5 @@
 		</div>
 	</div>
 
-{{> footer_inc.html}}
+{{/inline}}
+{{~> (parent)~}}

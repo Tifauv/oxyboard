@@ -1,4 +1,4 @@
-use config::data::{ Config, ServerParams, BoardParams, StorageParams, UiParams };
+use crate::config::data::{ Config, ServerParams, BoardParams, StorageParams, UiParams };
 
 /// Builds a default configuration.
 ///
