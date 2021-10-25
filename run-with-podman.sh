@@ -10,10 +10,11 @@ DATA_DIR=./data-run
 
 
 # Build the container
-#sudo podman build -t "${CONTAINER}" .
 podman build -t "${CONTAINER}" .
 
-# Run the container
-mkdir -p "${DATA_DIR}"
-#sudo podman run -d --name ${NAME} -v "${DATA_DIR}:/app/data" -p 8080:8080 "${CONTAINER}"
-podman run -d --name ${NAME} -v "${DATA_DIR}:/app/data" -p 8080:8080 "${CONTAINER}"
+if [ $? -eq 0 ]
+then
+	# Run the container
+	mkdir -p "${DATA_DIR}"
+	podman run -d --name ${NAME} -v "${DATA_DIR}:/app/data" -p 8080:8080 "${CONTAINER}"
+fi
