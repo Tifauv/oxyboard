@@ -7,13 +7,14 @@ use oxyboard::{ info_msg, warn_msg };
 use oxyboard::config;
 use oxyboard::config::{ Config, ConfigLoader, TomlConfigLoader };
 use oxyboard::core::{ History, HistoryRecorder };
-use oxyboard::requests::{ about, backend, board, clients_config, index };
+use oxyboard::requests::{ about, backend, board, clients_config, index, post };
 use oxyboard::storage::{ StorageBackend, CsvFileStorage };
 use rocket::fs::{ relative, FileServer };
 use rocket_dyn_templates::Template;
 use std::io;
 use std::io::Error;
 use std::path::Path;
+use std::sync::Mutex;
 
 
 /// Loads the configuration from the given file.
@@ -70,20 +71,15 @@ fn rocket() -> _ {
 	let history_recorder = HistoryRecorder::new(history_storage);
 	history.add_listener(Box::new(history_recorder));
 
-	// Store the history in a shared state and add it to the handlers chain
-	/*
-	let mut chain = Chain::new(mount(&config));
-	chain.link(State::<History>::both(history));
-	*/
-
 	// Start the server
     rocket::build()
         .attach(Template::fairing())
-        .manage(history)
+        .manage(Mutex::new(history)
         .mount("/", routes![index::redirect])
         .mount("/", routes![about::html])
         .mount("/", routes![board::html])
         .mount("/", routes![backend::full_xml, backend::last_xml, backend::since_xml])
+        .mount("/", routes![post::form])
         .mount("/", routes![clients_config::html])
         .mount("/res", FileServer::from(relative!("static")))
 }
