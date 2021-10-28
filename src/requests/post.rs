@@ -1,10 +1,9 @@
-use crate::core::{History, UserPost};
+use crate::core::{LockedHistory, UserPost};
 use rocket::post;
 use rocket::State;
 use rocket::form::{Form, FromForm};
 use rocket::http::Status;
 use rocket::request::{self, Request, FromRequest, Outcome};
-use std::sync::Mutex;
 
 
 pub struct UserAgent<'r>(Option<&'r str>);
@@ -32,8 +31,8 @@ pub struct Message {
 
 
 #[post("/post", data="<p_message>")]
-pub fn form(p_message: Form<Message>, p_user_agent: UserAgent<'_>, p_history: State<Mutex<History>>) -> Status {
-	let mut history = p_history.lock().expect("lock history");
+pub fn form(p_message: Form<Message>, p_user_agent: UserAgent<'_>, p_history: &State<LockedHistory>) -> Status {
+	let mut history = p_history.write().unwrap();
 
 	// Process the User-Agent
 	let mut user_agent = match p_user_agent.0 {
@@ -44,11 +43,11 @@ pub fn form(p_message: Form<Message>, p_user_agent: UserAgent<'_>, p_history: St
 	
 	match history.add_post(
 			UserPost {
-				login     : p_message.login,
+				login     : p_message.login.trim().to_string(),
 				user_agent: user_agent,
-				message   : p_message.message
+				message   : p_message.message.trim().to_string()
 			}) {
-		Ok(post_id) => Status::Created,             // TODO Add the X-Post-Id header
-		Err(error)  => Status::InternalServerError, // TODO Add the X-Post-Error
+		Ok(_post_id) => Status::Created,             // TODO Add the X-Post-Id header
+		Err(_error)  => Status::InternalServerError, // TODO Add the X-Post-Error
 	}
 }

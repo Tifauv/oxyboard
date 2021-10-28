@@ -4,8 +4,8 @@
 use crate::core::{Post, UserPost};
 use std::result::Result;
 use std::collections::vec_deque::{VecDeque, Iter};
-use time::OffsetDateTime;
-use time::format_description;
+use std::sync::RwLock;
+use chrono::Local;
 
 
 #[derive(Deserialize)]
@@ -138,23 +138,11 @@ impl History {
 	/// assert_eq!(hist.size(), 1);
 	/// ```
 	pub fn add_post(&mut self, p_user_post: UserPost) -> Result<u64, &str> {
-		// Get the current time
-/*		let datetime = match strftime("%Y%m%d%H%M%S", &now()) {
-			Ok(x) => x,
-			Err(_) => return Err("Failed to format the current datetime as needed !")
-		};
-*/
-        let format = match format_description::parse("[year][month][day][hour][minute][second]") {
-            Ok(x)  => x,
-            Err(_) => return Err("Failed to parse the datetime format!")
-        };
-
-        let datetime = OffsetDateTime::now_local()
-            .map_err(|e| e.to_string())
-            .and_then(|d: OffsetDateTime| d.format(&format).map_err(|e| e.to_string()));
-
 		// Create the new Post
-		let post = Post::new(self.next_post_id, datetime.unwrap(), p_user_post);
+		let post = Post::new(
+				self.next_post_id,
+				Local::now().format("%Y%m%d%H%M%S").to_string(),
+				p_user_post);
 
 		// Remove the oldest post if the history will exceed its maximum size
 		if self.data.posts.len() >= self.data.max_size {
@@ -246,3 +234,5 @@ impl HistoryListener for HistoryEventDispatcher {
 		}
 	}
 }
+
+pub type LockedHistory = RwLock<History>;

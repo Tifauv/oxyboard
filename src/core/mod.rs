@@ -1,4 +1,5 @@
 pub use self::history::History;
+pub use self::history::LockedHistory;
 pub use self::post::Post;
 pub use self::post::UserPost;
 pub use self::recorder::HistoryRecorder;

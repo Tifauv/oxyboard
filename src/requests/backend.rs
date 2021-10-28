@@ -1,7 +1,7 @@
 //!
 /// The handlers for backend requests.
 
-use crate::core::{ History, Post };
+use crate::core::{LockedHistory, Post};
 use rocket::get;
 use rocket::State;
 use rocket_dyn_templates::Template;
@@ -41,9 +41,11 @@ struct BackendContext<'a> {
 ///
 /// Builds the XML backend and returns it.
 #[get("/backend")]
-pub fn full_xml(p_history: &State<History>) -> Template {
+pub fn full_xml(p_history: &State<LockedHistory>) -> Template {
+	let history = p_history.read().unwrap();
+
 	let mut posts_view = Vec::new();
-	for post in p_history.iter()
+	for post in history.iter()
 		.rev()
 		.map(|ref p| PostViewModel::new(&p))
 		.collect::<Vec<_>>() {
@@ -52,7 +54,7 @@ pub fn full_xml(p_history: &State<History>) -> Template {
 
 	Template::render("backend", &BackendContext {
 		parent: "layout",
-		board_name: &p_history.board_name(),
+		board_name: &history.board_name(),
 		posts: posts_view
 	})
 }
@@ -62,9 +64,11 @@ pub fn full_xml(p_history: &State<History>) -> Template {
 ///
 /// Uses a :size URL parameter.
 #[get("/backend/last/<p_size>")]
-pub fn last_xml(p_size: usize, p_history: &State<History>) -> Template {
+pub fn last_xml(p_size: usize, p_history: &State<LockedHistory>) -> Template {
+	let history = p_history.read().unwrap();
+
 	let mut posts_view = Vec::new();
-	for post in p_history.iter()
+	for post in history.iter()
 		.rev()
 		.take(p_size)
 		.map(|ref p| PostViewModel::new(&p))
@@ -74,7 +78,7 @@ pub fn last_xml(p_size: usize, p_history: &State<History>) -> Template {
 
 	Template::render("backend", &BackendContext {
 		parent: "layout",
-		board_name: &p_history.board_name(),
+		board_name: &history.board_name(),
 		posts: posts_view
 	})
 }
@@ -90,9 +94,11 @@ pub fn last_xml(p_size: usize, p_history: &State<History>) -> Template {
 ///
 /// @returns the backend
 #[get("/backend/since/<p_post_id>")]
-pub fn since_xml(p_post_id: u64, p_history: &State<History>) -> Template {
+pub fn since_xml(p_post_id: u64, p_history: &State<LockedHistory>) -> Template {
+	let history = p_history.read().unwrap();
+
 	let mut posts_view = Vec::new();
-	for post in p_history.iter()
+	for post in history.iter()
 		.filter(|p| p.id() > p_post_id)
 		.rev()
 		.map(|ref p| PostViewModel::new(&p))
@@ -102,7 +108,7 @@ pub fn since_xml(p_post_id: u64, p_history: &State<History>) -> Template {
 
 	Template::render("backend", &BackendContext {
 		parent: "layout",
-		board_name: &p_history.board_name(),
+		board_name: &history.board_name(),
 		posts: posts_view
 	})
 }

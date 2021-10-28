@@ -14,7 +14,7 @@ use rocket_dyn_templates::Template;
 use std::io;
 use std::io::Error;
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 
 /// Loads the configuration from the given file.
@@ -74,7 +74,7 @@ fn rocket() -> _ {
 	// Start the server
     rocket::build()
         .attach(Template::fairing())
-        .manage(Mutex::new(history)
+        .manage(RwLock::new(history))
         .mount("/", routes![index::redirect])
         .mount("/", routes![about::html])
         .mount("/", routes![board::html])
