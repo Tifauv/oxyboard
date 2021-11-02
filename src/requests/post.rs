@@ -4,6 +4,7 @@ use rocket::State;
 use rocket::form::{Form, FromForm};
 use rocket::http::Status;
 use rocket::request::{self, Request, FromRequest, Outcome};
+use rocket::response::{self, Response, Responder};
 
 
 pub struct UserAgent<'r>(Option<&'r str>);
@@ -30,8 +31,20 @@ pub struct Message {
 }
 
 
+pub struct PostId(u64);
+
+impl<'r> Responder<'r, 'static> for PostId {
+	fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
+		Response::build()
+			.raw_header("X-Post-Id", self.0.to_string())
+			.status(Status::Created)
+			.ok()
+	}
+}
+
+
 #[post("/post", data="<p_message>")]
-pub fn form(p_message: Form<Message>, p_user_agent: UserAgent<'_>, p_history: &State<LockedHistory>) -> Status {
+pub fn form(p_message: Form<Message>, p_user_agent: UserAgent<'_>, p_history: &State<LockedHistory>) -> PostId {
 	let mut history = p_history.write().unwrap();
 
 	// Process the User-Agent
@@ -41,13 +54,11 @@ pub fn form(p_message: Form<Message>, p_user_agent: UserAgent<'_>, p_history: &S
 	};
 	user_agent.truncate(80);
 	
-	match history.add_post(
+	PostId(
+		history.add_post(
 			UserPost {
 				login     : p_message.login.trim().to_string(),
 				user_agent: user_agent,
 				message   : p_message.message.trim().to_string()
-			}) {
-		Ok(_post_id) => Status::Created,             // TODO Add the X-Post-Id header
-		Err(_error)  => Status::InternalServerError, // TODO Add the X-Post-Error
-	}
+			}))
 }

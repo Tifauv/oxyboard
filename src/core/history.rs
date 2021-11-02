@@ -2,7 +2,6 @@
 /// The history container and listener.
 
 use crate::core::{Post, UserPost};
-use std::result::Result;
 use std::collections::vec_deque::{VecDeque, Iter};
 use std::sync::RwLock;
 use chrono::Local;
@@ -118,7 +117,7 @@ impl History {
 	///
 	/// Before adding the new post, the oldest post is removed if the history is already full.
 	///
-	/// On success, this function returns the id attributed to the post.
+	/// This function returns the id attributed to the post.
 	///
 	/// # Examples
     ///
@@ -133,11 +132,11 @@ impl History {
 	/// let post = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	///
 	/// // Add the post to the history
-	/// let post_id = hist.add_post(post).unwrap();
+	/// let post_id = hist.add_post(post);
 	/// assert_eq!(post_id, 1);
 	/// assert_eq!(hist.size(), 1);
 	/// ```
-	pub fn add_post(&mut self, p_user_post: UserPost) -> Result<u64, &str> {
+	pub fn add_post(&mut self, p_user_post: UserPost) -> u64 {
 		// Create the new Post
 		let post = Post::new(
 				self.next_post_id,
@@ -156,7 +155,7 @@ impl History {
 
 		// Increment the post id counter
 		self.next_post_id += 1;
-		Ok(post_id)
+		post_id
 	}
 
 
@@ -171,12 +170,6 @@ impl History {
 		self.events.add_listener(p_listener);
 	}
 }
-
-/*
-impl Key for History {
-	type Value = History;
-}
-*/
 
 
 /// A `HistoryListener` is the interface for listening `History` events.
