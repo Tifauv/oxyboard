@@ -14,4 +14,4 @@ podman build -t "${CONTAINER}" .
 
 # Run the container
 mkdir -p "${DATA_DIR}"
-podman run -d --name ${NAME} -v "${DATA_DIR}:/app/data" -p 8000:8000 "${CONTAINER}"
+podman run -d --name ${NAME} -v "${DATA_DIR}:/oxyboard/data" -p 8000:8000 "${CONTAINER}"
