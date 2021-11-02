@@ -50,7 +50,7 @@ fn rocket() -> _ {
 	      	.get_matches();
 
 	// Gets a value for config if supplied by user, or defaults to "config/oxyboard.toml"
-	let config_file = matches.value_of("config").unwrap_or("config/oxyboard.toml");
+	let config_file = matches.value_of("config").unwrap_or("config/Oxyboard.toml");
 	let config = load_config(&config_file);
 
 	// Create the history storage engine
