@@ -16,5 +16,5 @@ if [ $? -eq 0 ]
 then
 	# Run the container
 	mkdir -p "${DATA_DIR}"
-	podman run -d --name ${NAME} -v "${DATA_DIR}:/app/data" -p 8080:8080 "${CONTAINER}"
+	podman run -d --name ${NAME} -v "${DATA_DIR}:/app/data" -p 8000:8000 "${CONTAINER}"
 fi
