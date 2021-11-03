@@ -2,7 +2,7 @@
 
 # Container name & tag
 NAME=oxyboard
-TAG=0.1.0-2.1
+TAG=0.2.0-1.0
 CONTAINER="${NAME}:${TAG}"
 
 # Host directory for the /app/data Volume

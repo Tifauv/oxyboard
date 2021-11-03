@@ -1,0 +1,36 @@
+#board {
+	background-color: #fdf6e3;
+	color: #657b83;
+}
+
+#board .table > tbody > tr > td {
+	border-top: 0;
+}
+
+#board .table tr:hover {
+	background-color: #eee8d5;
+	color: #657b83;
+}
+
+#board .post-author {
+	background-color: transparent;
+	color: #d33682;
+	font-style: italic;
+	min-width: 5em;
+	max-width: 5em;
+	padding-left: 0.4em;
+	padding-right: 0.4em;
+	text-align: right;
+}
+
+#board .post-time {
+	background-color: transparent;
+	color: #859900;
+	min-width: 2.4em;
+	max-width: 2.4em;
+}
+
+#board .post-message b {
+	background-color: transparent;
+	color: #586e75;
+}

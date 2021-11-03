@@ -1,11 +1,9 @@
 //!
-/// The handlers for the board's accepted requests.
+/// The handlers for the board's requests.
 
+pub mod index;
 pub mod about;
-pub mod backend;
 pub mod board;
-pub mod clconfig;
-pub mod default;
-pub mod headers;
+pub mod backend;
 pub mod post;
-pub mod templates;
+pub mod clients_config;

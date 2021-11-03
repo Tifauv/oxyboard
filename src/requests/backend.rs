@@ -1,15 +1,13 @@
 //!
 /// The handlers for backend requests.
 
-use core::{ History, Post };
-use iron::prelude::*;
-use mustache::MapBuilder;
-use persistent::State;
-use requests::templates::build_response;
-use router::Router;
+use crate::core::{LockedHistory, Post};
+use rocket::get;
+use rocket::State;
+use rocket_dyn_templates::Template;
 
 
-#[derive(Serialize)]
+#[derive(serde::Serialize)]
 struct PostViewModel<'a> {
 	id         : u64,
 	time       : &'a str,
@@ -17,7 +15,6 @@ struct PostViewModel<'a> {
 	message    : &'a str,
 	login      : &'a str,
 }
-
 
 impl<'a> PostViewModel<'a> {
 	fn new(p_post: &Post) -> PostViewModel {
@@ -32,57 +29,58 @@ impl<'a> PostViewModel<'a> {
 }
 
 
+#[derive(serde::Serialize)]
+struct BackendContext<'a> {
+    parent: &'static str,
+    board_name: &'a String,
+	posts: Vec<PostViewModel<'a>>
+}
+
+
 /// Handles GET requests for the full backend.
 ///
 /// Builds the XML backend and returns it.
-pub fn full_backend_handler(p_request: &mut Request) -> IronResult<Response> {
-	// Get access to the the shared history
-	let lock = p_request.get::<State<History>>().unwrap();
-	let history = lock.read().unwrap();
+#[get("/backend")]
+pub fn full_xml(p_history: &State<LockedHistory>) -> Template {
+	let history = p_history.read().unwrap();
 
-	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name().clone())
-		.insert_vec("posts",      |mut builder| {
-				for post in history.iter()
-						.rev()
-						.map(|ref p| PostViewModel::new(&p))
-						.collect::<Vec<_>>() {
-					builder = builder.push(&post).unwrap();
-				}
-				builder
-			})
-		.build();
+	let mut posts_view = Vec::new();
+	for post in history.iter()
+		.rev()
+		.map(|ref p| PostViewModel::new(&p))
+		.collect::<Vec<_>>() {
+		posts_view.push(post);
+	}
 
-	Ok(build_response("backend.xml", data))
+	Template::render("backend", &BackendContext {
+		parent: "layout",
+		board_name: &history.board_name(),
+		posts: posts_view
+	})
 }
 
 
 /// Handles GET requests for a backend containing the last n messages.
 ///
 /// Uses a :size URL parameter.
-pub fn sized_backend_handler(p_request: &mut Request) -> IronResult<Response> {
-	// Get access to the the shared history
-	let lock = p_request.get::<State<History>>().unwrap();
-	let history = lock.read().unwrap();
+#[get("/backend/last/<p_size>")]
+pub fn last_xml(p_size: usize, p_history: &State<LockedHistory>) -> Template {
+	let history = p_history.read().unwrap();
 
-	let size_str = p_request.extensions.get::<Router>().unwrap().find("size").unwrap_or("100");
-	let size = usize::from_str_radix(size_str, 10).unwrap_or(100);
+	let mut posts_view = Vec::new();
+	for post in history.iter()
+		.rev()
+		.take(p_size)
+		.map(|ref p| PostViewModel::new(&p))
+		.collect::<Vec<_>>() {
+		posts_view.push(post);
+	}
 
-	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name().clone())
-		.insert_vec("posts",      |mut builder| {
-				for post in history.iter()
-						.rev()
-						.take(size)
-						.map(|ref p| PostViewModel::new(&p))
-						.collect::<Vec<_>>() {
-					builder = builder.push(&post).unwrap();
-				}
-				builder
-			})
-		.build();
-
-	Ok(build_response("backend.xml", data))
+	Template::render("backend", &BackendContext {
+		parent: "layout",
+		board_name: &history.board_name(),
+		posts: posts_view
+	})
 }
 
 
@@ -95,27 +93,22 @@ pub fn sized_backend_handler(p_request: &mut Request) -> IronResult<Response> {
 /// uses "1" as the lastId.
 ///
 /// @returns the backend
-pub fn lastid_backend_handler(p_request: &mut Request) -> IronResult<Response> {
-	// Get access to the the shared history
-	let lock = p_request.get::<State<History>>().unwrap();
-	let history = lock.read().unwrap();
+#[get("/backend/since/<p_post_id>")]
+pub fn since_xml(p_post_id: u64, p_history: &State<LockedHistory>) -> Template {
+	let history = p_history.read().unwrap();
 
-	let last_id_str = p_request.extensions.get::<Router>().unwrap().find("lastId").unwrap_or("1");
-	let last_id = u64::from_str_radix(last_id_str, 10).unwrap_or(1);
+	let mut posts_view = Vec::new();
+	for post in history.iter()
+		.filter(|p| p.id() > p_post_id)
+		.rev()
+		.map(|ref p| PostViewModel::new(&p))
+		.collect::<Vec<_>>() {
+		posts_view.push(post);
+	}
 
-	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name().clone())
-		.insert_vec("posts",      |mut builder| {
-				for post in history.iter()
-						.filter(|p| p.id() > last_id)
-						.rev()
-						.map(|ref p| PostViewModel::new(&p))
-						.collect::<Vec<_>>() {
-					builder = builder.push(&post).unwrap();
-				}
-				builder
-			})
-		.build();
-
-	Ok(build_response("backend.xml", data))
+	Template::render("backend", &BackendContext {
+		parent: "layout",
+		board_name: &history.board_name(),
+		posts: posts_view
+	})
 }

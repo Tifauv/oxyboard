@@ -23,7 +23,9 @@ FROM alpine
 MAINTAINER Olivier Serve <tifauv@gmail.com>
 LABEL org.opencontainers.image.authors="tifauv.gmail.com"
 
-ENV APP_HOME=/app
+ENV APP_HOME=/oxyboard \
+	ROCKET_ADDRESS=0.0.0.0 \
+	ROCKET_PORT=8000
 
 RUN mkdir -pv "${APP_HOME}/bin" && \
 	mkdir -pv "${APP_HOME}/data"
@@ -31,13 +33,13 @@ RUN mkdir -pv "${APP_HOME}/bin" && \
 WORKDIR ${APP_HOME}
 COPY --from=builder /oxyboard/target/x86_64-unknown-linux-musl/release/oxyboard ./bin
 COPY config    ./config
+COPY static    ./static
 COPY templates ./templates
 
-# Default port is 8080/tcp
-EXPOSE 8080
+# Default port is 8000/tcp
+EXPOSE 8000
 
 # Data is stored in a "data" directory
 VOLUME ${APP_HOME}/data
 
-STOPSIGNAL SIGINT
-ENTRYPOINT ["/app/bin/oxyboard"]
+ENTRYPOINT ["/oxyboard/bin/oxyboard"]

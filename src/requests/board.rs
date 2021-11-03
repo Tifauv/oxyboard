@@ -1,25 +1,22 @@
-//!
-/// The handlers for the board ui.
-
-use core::History;
-use iron::prelude::*;
-use mustache::MapBuilder;
-use persistent::State;
-use requests::templates::build_response;
+use crate::core::LockedHistory;
+use rocket::get;
+use rocket::State;
+use rocket_dyn_templates::Template;
 
 
-/// Handler for GET board requests.
-///
-/// Builds the HTML page and returns it.
-pub fn board_handler(p_request: &mut Request) -> IronResult<Response> {
-	// Get access to the the shared history
-	let lock = p_request.get::<State<History>>().unwrap();
-	let history = lock.read().unwrap();
+#[derive(serde::Serialize)]
+struct BoardContext<'a> {
+    parent: &'static str,
+    board_name: &'a String
+}
 
-	let data = MapBuilder::new()
-		.insert_str("board_name", history.board_name().clone())
-		.insert_str("current_page_board", "class=\"active\"")
-		.build();
 
-	Ok(build_response("board.html", data))
+#[get("/board")]
+pub fn html(p_history: &State<LockedHistory>) -> Template {
+	let history = p_history.read().unwrap();
+
+	Template::render("board", &BoardContext {
+        parent: "layout",
+        board_name: &history.board_name()
+    })
 }

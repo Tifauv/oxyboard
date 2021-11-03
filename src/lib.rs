@@ -42,17 +42,8 @@
 ///
 /// # Configuration
 ///
-extern crate csv;
-#[macro_use]
-extern crate hyper;
-extern crate iron;
-extern crate mustache;
-extern crate persistent;
-extern crate router;
 #[macro_use] extern crate serde_derive;
-extern crate time;
 extern crate toml;
-extern crate urlencoded;
 
 
 /// This macro prints an infomation message prefixed by Unicode character 'CIRCLED LATIN SMALL LETTER I' (U+24D8).

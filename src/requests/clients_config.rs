@@ -5,17 +5,17 @@ use rocket_dyn_templates::Template;
 
 
 #[derive(serde::Serialize)]
-struct AboutContext<'a> {
+struct ClientsConfigContext<'a> {
     parent: &'static str,
     board_name: &'a String
 }
 
 
-#[get("/about")]
+#[get("/clients/config")]
 pub fn html(p_history: &State<LockedHistory>) -> Template {
 	let history = p_history.read().unwrap();
 
-    Template::render("about", &AboutContext {
+	Template::render("clients_config", &ClientsConfigContext {
         parent: "layout",
         board_name: &history.board_name()
     })

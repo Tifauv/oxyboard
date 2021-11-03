@@ -1,0 +1,58 @@
+{{#*inline "page"}}
+
+	<div id="content" class="container">
+		<div class="col-sm-10">
+			<div id="board" class="panel panel-default">
+				<table class="table table-condensed">
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div id="post" class="footer navbar-fixed-bottom">
+		<form id="post-form" name="post-form">
+			<input type="hidden" id="login" name="login" value="Anonyme">
+			<div class="form-group">
+				<label class="sr-only" for="message">Message</label>
+				<div class="input-group">
+					<div class="input-group-addon">Anonyme</div>
+					<input type="text" class="form-control" id="message" name="message" placeholder="Entrez votre message ici">
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-primary" id="send">
+							<span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+						</button>
+					</span>
+				</div>
+			</div>
+		</form>
+		<div id="feedback"></div>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/res/js/board.js"></script>
+	<script>
+		$(document).ready(function() {
+			loadBoard();
+
+			$("#post-form").submit(function() {
+				console.log("Submitting the form...");
+				$.ajax({
+					url     : "/post",
+					data    : $('#post-form').serialize(),
+					type    : "POST",
+					dataType: "text"
+				}).done(function(p_response) {
+					updateBoard();
+				}).fail(function(p_response, p_status, p_message) {
+					showWarningFeedback("<strong>Erreur&nbsp;:</strong> " + p_message);
+				});
+				console.log("POST request sent.");
+				return false;
+			});
+			setInterval(updateBoard, 8000);
+		});
+	</script>
+
+{{/inline}}
+{{~> (parent)~}}

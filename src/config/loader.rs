@@ -1,4 +1,4 @@
-use config::data::Config;
+use crate::config::data::Config;
 use std::io;
 
 /// Defines the common interface to configuration loaders.

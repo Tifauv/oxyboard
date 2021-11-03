@@ -1,11 +1,10 @@
 //!
 /// The history container and listener.
 
-use core::{Post, UserPost};
-use iron::typemap::Key;
-use time::{now, strftime};
-use std::result::Result;
+use crate::core::{Post, UserPost};
 use std::collections::vec_deque::{VecDeque, Iter};
+use std::sync::RwLock;
+use chrono::Local;
 
 
 #[derive(Deserialize)]
@@ -118,7 +117,7 @@ impl History {
 	///
 	/// Before adding the new post, the oldest post is removed if the history is already full.
 	///
-	/// On success, this function returns the id attributed to the post.
+	/// This function returns the id attributed to the post.
 	///
 	/// # Examples
     ///
@@ -133,19 +132,16 @@ impl History {
 	/// let post = UserPost::new(String::from(""), String::from("Firefox/48.0.1"), String::from("Plop!"));
 	///
 	/// // Add the post to the history
-	/// let post_id = hist.add_post(post).unwrap();
+	/// let post_id = hist.add_post(post);
 	/// assert_eq!(post_id, 1);
 	/// assert_eq!(hist.size(), 1);
 	/// ```
-	pub fn add_post(&mut self, p_user_post: UserPost) -> Result<u64, &str> {
-		// Get the current time
-		let datetime = match strftime("%Y%m%d%H%M%S", &now()) {
-			Ok(x) => x,
-			Err(_) => return Err("Failed to format the current datetime as needed !")
-		};
-
+	pub fn add_post(&mut self, p_user_post: UserPost) -> u64 {
 		// Create the new Post
-		let post = Post::new(self.next_post_id, datetime, p_user_post);
+		let post = Post::new(
+				self.next_post_id,
+				Local::now().format("%Y%m%d%H%M%S").to_string(),
+				p_user_post);
 
 		// Remove the oldest post if the history will exceed its maximum size
 		if self.data.posts.len() >= self.data.max_size {
@@ -159,7 +155,7 @@ impl History {
 
 		// Increment the post id counter
 		self.next_post_id += 1;
-		Ok(post_id)
+		post_id
 	}
 
 
@@ -173,10 +169,6 @@ impl History {
 	pub fn add_listener(&mut self, p_listener: Box<dyn HistoryListener + Send + Sync>) {
 		self.events.add_listener(p_listener);
 	}
-}
-
-impl Key for History {
-	type Value = History;
 }
 
 
@@ -235,3 +227,5 @@ impl HistoryListener for HistoryEventDispatcher {
 		}
 	}
 }
+
+pub type LockedHistory = RwLock<History>;
