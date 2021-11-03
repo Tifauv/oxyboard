@@ -6,12 +6,13 @@ Oxyboard
 Oxyboard is a _tribune_, a sort of web-based chat room.
 
 It is written in [Rust](https://www.rust-lang.org) as a toy project to learn the language.
-The HTTP server part is handled by [Iron](https://github.com/iron/iron "Iron on GitHub").
+The initial HTTP server used was [Iron](https://github.com/iron/iron "Iron on GitHub")
+but since it doesn't evolve anymore, the project was switched to using [Rocket](https://rocket.rs/).
 
 ## Features
 
 - **Self-contained**. The compilation result is a binary that you can start directly. No need for an application server.
-- **No configuration needed**. A default configuration is builtin, that allow you to start a board listening on localhost:8080.
+- **No configuration needed**. A default configuration is builtin, that allow you to start a board listening on localhost:8000.
 - **REST API**. See the API section below.
 - **Fast**. On a modest Core i5-4200M powered laptop, it could handle more around 700 new messages per second.
   And it is still limited by the disk I/O because all writes are synchronous for now.
@@ -77,11 +78,13 @@ Using this simple but powerfull mechanism, it is possible to follow multiple int
 
 ## I want to get it !
 
-Being writen in Rust, you need the [Rustc compiler](https://www.rust-lang.org/fr/downloads.html) version 1.13 minimum to build the project. Rust distributions now come with the `Cargo` builder.
+Being writen in Rust, you need the [Rustc compiler](https://www.rust-lang.org/fr/downloads.html). No backwards tests have been done, but it builds nicely using the 1.54 version. No need for nightly features.
 
 Then, you should [get the code on GitHub](https://github.com/Tifauv/oxyboard).
-A `cargo run` will take care of downloading the dependencies, building all that and starting a board
-on 0.0.0.0:8080.
+A `cargo run` will take care of downloading the dependencies, building all that and starting a board on 0.0.0.0:8000.
+
+A two-stages Dockerfile is also provided so that you can build a container even if you don't have Rust installed on your system.
+
 
 ## Documentation
 
