@@ -1,5 +1,4 @@
 {{#*inline "page"}}
-
 	<div id="content" class="container">
 		<div class="col-sm-10">
 			<div id="board" class="panel panel-default">
@@ -9,24 +8,26 @@
 		</div>
 	</div>
 
-	<div id="post" class="footer navbar-fixed-bottom">
-		<form id="post-form" name="post-form">
-			<input type="hidden" id="login" name="login" value="Anonyme">
-			<div class="form-group">
-				<label class="sr-only" for="message">Message</label>
-				<div class="input-group">
-					<div class="input-group-addon">Anonyme</div>
-					<input type="text" class="form-control" id="message" name="message" placeholder="Entrez votre message ici">
-					<span class="input-group-btn">
-						<button type="submit" class="btn btn-primary" id="send">
-							<span class="glyphicon glyphicon-send" aria-hidden="true"></span>
-						</button>
-					</span>
+	<footer id="post" class="footer mt-auto py-3 bg-light fixed-bottom">
+		<div class="container">
+			<div id="feedback"></div>
+			<form id="post-form" name="post-form">
+				<input type="hidden" id="login" name="login" value="Anonyme">
+				<div class="form-group">
+					<label class="visually-hidden" for="message">Message</label>
+					<div class="input-group">
+						<div class="input-group-text">Anonyme</div>
+						<input type="text" class="form-control" id="message" name="message" placeholder="Entrez votre message ici">
+						<span class="input-group-btn">
+							<button type="submit" class="btn btn-primary" id="send">
+								<span class="bi-send-fill" aria-hidden="true"></span>
+							</button>
+						</span>
+					</div>
 				</div>
-			</div>
-		</form>
-		<div id="feedback"></div>
-	</div>
+			</form>
+		</div>
+	</footer>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	<script src="/res/js/board.js"></script>
@@ -52,6 +53,5 @@
 			setInterval(updateBoard, 8000);
 		});
 	</script>
-
 {{/inline}}
 {{~> (parent)~}}
